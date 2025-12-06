@@ -1,0 +1,188 @@
+===========================================
+EMAIL BRIEFING APP - CODE CHANGES LOG
+===========================================
+Date: 2025-11-23
+Engineer: Claude (MCP)
+Task Source: Mark (Direct Request)
+
+===========================================
+EDIT 1: app-form.js - Fix formData Initialization
+===========================================
+
+File: /Users/marksexton/Desktop/Email-Briefing-App/js/app-form.js
+Function: handleTemplateChange(e)
+
+CHANGE SUMMARY:
+--------------
+Replaced local `formData = { ... }` assignments with mutations of `window.formData` using Object.assign() pattern. This ensures that formData always points to the global window.formData object, preventing reference issues.
+
+BEFORE:
+-------
+if (!window.isLoadingProject) {
+    if(val === "webinar-invite") {
+        formData = {
+            "eyebrow": "Webinar",
+            "headline": "This is your headline",
+            ...
+        };
+    }
+}
+
+AFTER:
+------
+if (!window.isLoadingProject) {
+    // Reset global formData safely
+    Object.keys(window.formData).forEach(key => delete window.formData[key]);
+    
+    if(val === "webinar-invite") {
+        Object.assign(window.formData, {
+            "eyebrow": "Webinar",
+            "headline": "This is your headline",
+            ...
+        });
+    }
+}
+
+AFFECTED TEMPLATES:
+-------------------
+✓ webinar-invite
+✓ webinar-reg-confirmation
+✓ webinar-reminder
+✓ webinar-post-attendee
+✓ webinar-post-noshow
+✓ education-drip-employer
+✓ education-drip-hp
+✓ partner-essentials-nl
+✓ consultant-connect-nl
+✓ client-connections-nl
+
+DEBUG LOG ADDED:
+----------------
+console.log("Initialized default formData for template:", val, window.formData);
+
+EXPECTED OUTCOME:
+-----------------
+- Opening Education Drip templates shows real purple/black text (not grey placeholders)
+- Default content is properly stored in window.formData
+- Content will export correctly to Excel
+- Saved designs/share links remain unaffected (protected by !window.isLoadingProject guard)
+
+===========================================
+EDIT 2: app-images.js - Add File Size Validation
+===========================================
+
+File: /Users/marksexton/Desktop/Email-Briefing-App/js/app-images.js
+Function: createImageUpload(field) / processImageFile(file)
+
+CHANGE SUMMARY:
+--------------
+Added client-side file size validation to prevent uploads larger than 500 KB. Users receive immediate, clear error messages when attempting to upload oversized images.
+
+NEW CONSTANT:
+-------------
+const MAX_IMAGE_FILE_SIZE_BYTES = 500 * 1024; // 500 KB
+
+ADDED VALIDATION:
+-----------------
+async function processImageFile(file) {
+    // Client-side file size guard
+    if (file.size > MAX_IMAGE_FILE_SIZE_BYTES) {
+        const maxKb = Math.round(MAX_IMAGE_FILE_SIZE_BYTES / 1024);
+        const actualKb = Math.round(file.size / 1024);
+
+        console.warn(
+            `Image too large: ${actualKb} KB (limit is ${maxKb} KB). Upload blocked.`
+        );
+
+        // Friendly UI message in the drop zone
+        zone.innerHTML = `
+            <div class="image-uploading">
+                <div class="upload-text" style="color:#e74c3c;">
+                    Image too large (${actualKb} KB). Max allowed is ${maxKb} KB.
+                    Please upload a smaller, optimized image.
+                </div>
+            </div>
+        `;
+
+        // Reset back to normal UI after 3 seconds
+        setTimeout(() => {
+            zone.innerHTML = `
+                <svg class="drop-zone-icon" viewBox="0 0 24 24" fill="none">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                </svg>
+                <div class="drop-zone-text">Drop image, paste or double-click</div>
+            `;
+        }, 3000);
+
+        return; // Do not upload
+    }
+    
+    // ... rest of upload logic
+}
+
+EXPECTED BEHAVIOR:
+------------------
+FILES > 500 KB:
+- Upload is blocked immediately
+- User sees clear error message with actual size vs. limit
+- No Firebase upload attempt is made
+- UI resets after 3 seconds
+
+FILES ≤ 500 KB:
+- Upload proceeds normally
+- Loading spinner displays
+- Image is uploaded to Firebase Storage
+- Preview displays successfully
+
+UPLOAD METHODS COVERED:
+------------------------
+✓ Drag and drop
+✓ Double-click file dialog
+✓ Paste from clipboard
+✓ File input selection
+
+===========================================
+TESTING NOTES
+===========================================
+
+TEST CASE 1: Education Drip Templates
+--------------------------------------
+1. Open app in browser
+2. Select "Education Drip – Employer" template
+3. VERIFY: Form fields show purple/black text (not grey placeholders)
+4. VERIFY: Text appears in right-hand preview
+5. Export to Excel
+6. VERIFY: Excel contains the default text values
+
+TEST CASE 2: Image Size Validation
+-----------------------------------
+1. Prepare two test images:
+   - One < 500 KB (should succeed)
+   - One > 500 KB (should fail)
+2. Attempt to upload large image
+3. VERIFY: Error message displays with size information
+4. VERIFY: No loading spinner appears
+5. VERIFY: UI resets after 3 seconds
+6. Upload small image
+7. VERIFY: Normal upload flow with loading spinner
+8. VERIFY: Image displays in preview
+
+===========================================
+FILES MODIFIED
+===========================================
+1. /Users/marksexton/Desktop/Email-Briefing-App/js/app-form.js
+2. /Users/marksexton/Desktop/Email-Briefing-App/js/app-images.js
+
+===========================================
+DEPLOYMENT NOTES
+===========================================
+- No database migrations required
+- No template.js changes needed
+- Existing saved designs remain compatible
+- Firebase configuration unchanged
+- Refresh browser to load updated JavaScript
+
+===========================================
+END OF LOG
+===========================================

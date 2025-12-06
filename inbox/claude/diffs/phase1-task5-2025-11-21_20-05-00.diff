@@ -1,0 +1,105 @@
+PHASE 1 - TASK 5 DIFF
+=====================
+File: js/app-firebase.js
+Timestamp: 2025-11-21_20:05:00
+Operation: Add Safety Guard Before Firestore Write
+
+CHANGES MADE:
+-------------
+
+1. MODIFIED saveDesign() function:
+   Added before db.collection().set():
+   + // TASK 5: Safety guard to prevent Base64 bomb from crashing sync
+   + const documentToSave = {
+   +     id: id,
+   +     data: designData,
+   +     timestamp: Date.now(),
+   +     projectName: designData.projectName || 'Untitled',
+   +     template: designData.template || 'standard-template',
+   +     folderId: designData.folderId || null
+   + };
+   + 
+   + const documentSize = JSON.stringify(documentToSave).length;
+   + if (documentSize > 950000) {
+   +     console.warn(`Design too large (${documentSize} bytes) — images must be URLs.`);
+   +     alert("Project too large to save. One or more images may not have uploaded properly. Please remove or re-upload large images.");
+   +     return false;
+   + }
+   + 
+   + await db.collection('designs').doc(id).set(documentToSave);
+
+2. MODIFIED saveExport() function:
+   Added identical safety guard:
+   + // TASK 5: Safety guard to prevent Base64 bomb from crashing sync
+   + const documentToSave = {
+   +     id: id,
+   +     data: exportData,
+   +     timestamp: Date.now(),
+   +     projectName: exportData.projectName || 'Untitled',
+   +     folderId: exportData.folderId || null
+   + };
+   + 
+   + const documentSize = JSON.stringify(documentToSave).length;
+   + if (documentSize > 950000) {
+   +     console.warn(`Export too large (${documentSize} bytes) — images must be URLs.`);
+   +     alert("Export too large to save. One or more images may not have uploaded properly. Please remove or re-upload large images.");
+   +     return false;
+   + }
+   + 
+   + await db.collection('exports').doc(id).set(documentToSave);
+
+3. MODIFIED saveMeta() function:
+   Added safety guard for metadata:
+   + // TASK 5: Safety guard for metadata saves
+   + const documentToSave = {
+   +     id: id,
+   +     data: JSON.stringify(data),
+   +     timestamp: Date.now()
+   + };
+   + 
+   + const documentSize = JSON.stringify(documentToSave).length;
+   + if (documentSize > 950000) {
+   +     console.warn(`Metadata too large (${documentSize} bytes) to save.`);
+   +     return false;
+   + }
+   + 
+   + await db.collection('metadata').doc(id).set(documentToSave);
+
+KEY IMPLEMENTATION DETAILS:
+---------------------------
+- Size check happens BEFORE Firestore write
+- Threshold: 950,000 bytes (under 1MB Firestore limit)
+- Returns false on size violation (prevents save)
+- User-friendly alert message
+- Console warning with actual size
+- Applied to all save functions (designs, exports, metadata)
+
+PURPOSE:
+--------
+Per Task 5 requirements:
+- Prevents Base64 bomb from crashing sync
+- Checks document size before Firestore write
+- Alerts user if images aren't properly uploaded as URLs
+- Protects against Firestore 1MB document limit
+
+SAFETY BEHAVIOR:
+----------------
+1. Build complete document structure
+2. Stringify to measure size
+3. If > 950KB:
+   - Log warning with actual size
+   - Show alert to user
+   - Return false (abort save)
+4. If <= 950KB:
+   - Proceed with Firestore write
+   - Return true (success)
+
+VERIFICATION:
+-------------
+✓ saveDesign() has safety guard
+✓ saveExport() has safety guard
+✓ saveMeta() has safety guard
+✓ Size threshold set to 950,000 bytes
+✓ User gets clear error message
+✓ Console logs document size on failure
+✓ Returns false to prevent save

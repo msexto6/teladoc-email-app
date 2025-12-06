@@ -1,0 +1,26 @@
+TEMPLATES DROPDOWN FIX - IMPLEMENTATION COMPLETE
+==============================================
+
+BUG FIXED:
+Templates dropdown disappeared when moving cursor from nav label to menu
+
+ROOT CAUSE:
+10px margin-top gap created dead zone that lost hover state
+
+FIX APPLIED:
+Changed margin-top from 10px to -2px in .templates-dropdown CSS rule
+
+FILE CHANGED:
+css/masthead.css (line 104)
+
+RESULT:
+Dropdown now stays open when moving cursor from "Templates" down into menu items
+
+TEST STATUS:
+✓ Chrome opened with app
+✓ Ready for user verification
+
+LOGGED TO MEMORY BUS:
+✓ Diff: inbox/claude/diffs/2024-11-30_templates-dropdown-fix.diff
+✓ Log: inbox/claude/logs/2024-11-30_templates-dropdown-fix.log
+✓ This file: inbox/claude/changes/2024-11-30_templates-dropdown-fix.txt

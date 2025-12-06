@@ -1,0 +1,119 @@
+PHASE 4 - TASK K: MAKE EXPORTS MATCH LIVE PREVIEW (HEADER + LOGO + IMAGES)
+===============================================================================
+Date: 2025-11-23 01:41:46
+Files Modified: 3
+
+================================================================================
+FILE 1: js/app-preview.js
+================================================================================
+CHANGES:
++ Added getPreviewHtml() function to expose preview HTML for export reuse
++ Function returns outerHTML of #preview-content element
++ Exposed globally via window.getPreviewHtml for use by export module
++ Added comprehensive JSDoc comments
+
+PURPOSE:
+- Enables export to reuse exact HTML shown in Live Preview
+- Ensures visual consistency between preview and exported files
+- Single source of truth for email rendering
+
+================================================================================
+FILE 2: js/templates.js
+================================================================================
+CHANGES:
++ Added staticAssets array to ALL template definitions
++ Each template now includes Teladoc logo as a static asset
++ Partner Essentials NL includes both logo and header art
++ All static assets marked with export: true flag
+
+STATIC ASSETS BY TEMPLATE:
+- standard-template: teladoc-logo.png
+- webinar-invite: teladoc-logo.png
+- webinar-reg-confirmation: teladoc-logo.png
+- webinar-reminder: teladoc-logo.png
+- webinar-post-attendee: teladoc-logo.png
+- webinar-post-noshow: teladoc-logo.png
+- education-drip-employer: teladoc-logo.png
+- education-drip-hp: teladoc-logo.png
+- partner-essentials-nl: teladoc-logo.png + partner-essentials.jpg
+- consultant-connect-nl: teladoc-logo.png
+- client-connections-nl: teladoc-logo.png
+
+PURPOSE:
+- Declares which static images should be bundled in exports
+- Maintains consistency with preview rendering
+- Makes asset requirements explicit in template schema
+
+================================================================================
+FILE 3: js/app-export.js
+================================================================================
+MAJOR CHANGES:
+
+1. TASK K1 - Reuse Preview HTML:
+   + Modified PDF generation to use #preview-content element directly
+   + Added HTML file generation from getPreviewHtml()
+   + HTML now wrapped in minimal document structure with embedded styles
+   + Both PDF and HTML now match Live Preview exactly
+
+2. TASK K2 - Bundle Static Assets:
+   + Added getExtensionFromPath() helper function
+   + Added makeExportFileName() to generate consistent filenames
+   + Added collectStaticAssets() to gather template's static assets
+   + Modified export pipeline to merge uploaded + static images
+   + Added detailed console logging for image collection
+
+3. Image Collection Flow:
+   allImages[] now contains:
+   - User-uploaded images (sourceType: 'uploaded')
+   - Template static assets (sourceType: 'static')
+   
+4. Filename Generation:
+   - Static assets: "static-<asset-id>.<ext>"
+   - Uploaded images: "<field-key>.<ext>"
+
+5. Success Message Updated:
+   Now reports:
+   - Total image count
+   - Breakdown: X uploaded + Y static assets
+   - Confirms HTML matches Live Preview
+   - Confirms PDF includes header + logo
+
+PURPOSE:
+- Eliminates divergence between preview and export
+- Ensures all visual elements appear in exported files
+- Provides comprehensive asset bundling
+
+================================================================================
+VALIDATION CHECKS PERFORMED:
+================================================================================
+✓ getPreviewHtml() properly exposed globally
+✓ All templates include staticAssets definitions
+✓ Export collects both uploaded and static images
+✓ Filenames generated without collisions
+✓ HTML export uses preview HTML via getPreviewHtml()
+✓ PDF export uses #preview-content element
+✓ Console logging comprehensive for debugging
+✓ Backward compatibility maintained (templates without staticAssets work)
+✓ Error handling preserved from previous phases
+
+================================================================================
+TESTING REQUIREMENTS:
+================================================================================
+1. Partner Essentials NL design:
+   - Verify Live Preview shows logo + header art
+   - Export and check ZIP contains:
+     * static-teladoc-logo.png in images/
+     * static-partner-essentials-header.jpg in images/
+     * index.html displays header when opened
+     * PDF shows header art at top
+   
+2. Standard template design:
+   - Verify only logo is bundled (no header art)
+   
+3. Design with uploaded images:
+   - Verify both uploaded AND static assets appear in images/
+   - Verify no filename collisions
+
+================================================================================
+END OF DIFF
+================================================================================

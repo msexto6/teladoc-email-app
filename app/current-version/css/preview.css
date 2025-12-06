@@ -1,0 +1,304 @@
+/* ============================================
+   PREVIEW PANEL & EMAIL RENDERING
+   ============================================ */
+
+.preview-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.preview-container {
+    margin-top: 25px;
+    padding: 0; /* Removed padding */
+    background: transparent;
+    border-radius: var(--radius-lg);
+    min-height: 500px;
+    display: flex;
+    justify-content: center; /* Changed from center to flex-start */
+}
+
+.preview-email {
+    width: 600px;
+    background: var(--color-white);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: var(--transition-normal);
+}
+
+.preview-email.mobile-view {
+    width: 375px;
+}
+
+/* Mobile view - force responsive layout for email tables */
+.preview-email.mobile-view table {
+    width: 100% !important;
+    max-width: 375px !important;
+}
+
+.preview-email.mobile-view table[width="600"] {
+    width: 100% !important;
+}
+
+.preview-email.mobile-view td[style*="padding:40px 60px"],
+.preview-email.mobile-view td[style*="padding: 40px 60px"] {
+    padding: 20px !important;
+}
+
+.preview-email.mobile-view h1 {
+    font-size: 24px !important;
+}
+
+.preview-email.mobile-view h2 {
+    font-size: 22px !important;
+}
+
+.preview-email.mobile-view .preview-cta,
+.preview-email.mobile-view a[style*="padding:16px 48px"] {
+    padding: 14px 32px !important;
+    font-size: 16px !important;
+}
+
+/* Preview Email Content Styles */
+.preview-logo {
+    padding: 20px 30px;
+    background: var(--color-white);
+}
+
+.preview-logo img {
+    height: 30px;
+    display: block;
+}
+
+.preview-hero-image {
+    width: 100%;
+    display: block;
+}
+
+.preview-placeholder {
+    width: 100%;
+    height: 250px;
+    background: var(--color-gray-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray);
+    font-size: 18px;
+}
+
+.preview-content-body {
+    padding: var(--spacing-xl) 50px;
+}
+
+.preview-hero-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.preview-eyebrow {
+    font-size: 1.05em;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    margin-bottom: 16px;
+}
+
+.preview-headline {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    text-decoration: none !important;
+}
+
+.preview-headline u {
+    text-decoration: none !important;
+}
+
+.preview-datetime {
+    font-size: 18px;
+    font-weight: 700;
+    color: #00B5E2;
+    margin-bottom: 24px;
+}
+
+.preview-body {
+    font-size: 1.05em;
+    color: var(--color-black);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.preview-body a {
+    color: #00B5E2;
+    text-decoration: underline;
+}
+
+.preview-body ul {
+    margin: 20px 0;
+    padding-left: 40px;
+}
+
+.preview-body ul li {
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.preview-bullets {
+    margin: 20px 0;
+    padding-left: 0;
+}
+
+.preview-bullets li {
+    font-size: 1.05em;
+    color: var(--color-black);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    margin-left: 20px;
+}
+
+.preview-signature {
+    margin: 30px 0;
+    font-size: 1.05em;
+    color: var(--color-black);
+    line-height: 1.6;
+}
+
+.preview-signature-name {
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+.preview-signature-title {
+    font-style: italic;
+}
+
+.preview-cta-container {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.preview-cta {
+    display: inline-block;
+    padding: 16px 48px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 18px;
+    transition: var(--transition-fast);
+}
+
+.preview-cta:hover {
+    background: var(--color-primary-dark);
+}
+
+/* Speakers Section */
+.preview-speakers-section {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 2px solid var(--color-gray-light);
+}
+
+.preview-speakers-title {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.preview-speakers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    text-align: center;
+    transition: var(--transition-normal);
+}
+
+.preview-speaker-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    margin: 0 auto 16px;
+    background: var(--color-gray-light);
+}
+
+.preview-speaker-name {
+    font-size: 1.05em;
+    font-weight: 700;
+    color: var(--color-black);
+    margin-bottom: 4px;
+}
+
+.preview-speaker-title {
+    font-size: 1.05em;
+    color: var(--color-black);
+    line-height: 1.4;
+}
+
+/* Featured Content Cards */
+.preview-features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.preview-feature-card {
+    background: var(--color-gray-lighter);
+    padding: 24px;
+    border-radius: var(--radius-md);
+}
+
+.preview-feature-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
+.preview-feature-link {
+    display: inline-block;
+    color: #00B5E2;
+    text-decoration: none;
+    font-weight: 700;
+    margin-top: 12px;
+    font-size: 1.05em;
+}
+
+.preview-feature-link:hover {
+    text-decoration: underline;
+}
+
+/* Featured Content Image */
+.preview-feature-image {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    display: block;
+}
+
+/* Highlight Section with Light Purple Background */
+.preview-highlight-section {
+    margin-top: 40px;
+    padding: 24px;
+    background-color: var(--color-primary-lightest);
+    border-radius: var(--radius-md);
+}
+
+/* Mobile View Adjustments */
+.preview-email.mobile-view .preview-speakers-grid {
+    grid-template-columns: 1fr;
+}
+
+.preview-email.mobile-view .preview-features-grid {
+    grid-template-columns: 1fr;
+}
+
+.preview-email.mobile-view .preview-content-body {
+    padding: 20px !important;
+}

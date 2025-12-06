@@ -1,0 +1,144 @@
+PHASE 2 - TEMPLATE SYSTEM OVERHAUL - DIFF
+==========================================
+Generated: 2025-01-24 15:00:00
+Author: GPT-5.1 (Architect)
+Executor: Claude (Implementation Engineer)
+
+FILE 1: /Users/marksexton/Desktop/Email-Briefing-App/index.html
+-----------------------------------------------------------------
+LINE 145: Removed
+- <select id="template-selector"></select>
+
+LINE 437-447: Removed inline script
+- <!-- PHASE 2 TASK 0: Template selector event listener -->
+- <script>
+- document.addEventListener("DOMContentLoaded", function() {
+-     const sel = document.getElementById("template-selector");
+-     if (sel) {
+-         sel.addEventListener("change", handleTemplateSelection);
+-         console.log("Template selector event listener attached.");
+-     } else {
+-         console.warn("template-selector dropdown not found in DOM.");
+-     }
+- });
+- </script>
+
+REASON: Removed legacy template selector dropdown and associated JavaScript
+
+
+FILE 2: /Users/marksexton/Desktop/Email-Briefing-App/js/navigation.js
+----------------------------------------------------------------------
+LINES 330-333: Added in selectTemplate function
++ // PHASE 2 TASK 2: Set template in window and sessionStorage
++ window.currentTemplateKey = templateId;
++ window.currentTemplate = window.templates?.[templateId];
++ sessionStorage.setItem("selectedTemplateKey", templateId);
+
+LINES 353-357: Modified
+- // Set the template in the dropdown
+- const templateSelector = document.getElementById('template-selector');
+- templateSelector.value = templateId;
++ // Set the template in the dropdown (if it still exists for backward compatibility)
++ const templateSelector = document.getElementById('template-selector');
++ if (templateSelector) {
++     templateSelector.value = templateId;
+
+LINES 365-368: Added
++ // Load the template if loadTemplateByKey exists
++ if (typeof window.loadTemplateByKey === 'function') {
++     window.loadTemplateByKey(templateId);
++ }
+
+LINES 371-383: Added new function
++ // Alternative navigation function for template pages (if needed)
++ function navigateToTemplatePage(templateKey) {
++     // PHASE 2 TASK 2: Set template in window and sessionStorage
++     window.currentTemplateKey = templateKey;
++     window.currentTemplate = window.templates?.[templateKey];
++     sessionStorage.setItem("selectedTemplateKey", templateKey);
++     
++     // Navigate to builder with template parameter
++     showScreen('builder');
++     
++     // Load the template if loadTemplateByKey exists
++     if (typeof window.loadTemplateByKey === 'function') {
++         window.loadTemplateByKey(templateKey);
++     }
++ }
+
+REASON: Added template activation in navigation functions
+
+
+FILE 3: /Users/marksexton/Desktop/Email-Briefing-App/js/app-core.js
+--------------------------------------------------------------------
+LINES 11-22: Commented out
++ // PHASE 2 TASK 3: Commented out template selector population
++ /*
+  document.addEventListener("DOMContentLoaded", function () {
+      const selector = document.getElementById("template-selector");
+      ...
+  });
++ */
+
+LINES 41-42: Modified
+- populateTemplateSelector();
++ // PHASE 2 TASK 3: Commented out template selector population
++ // populateTemplateSelector();
+
+LINES 45-50: Added
++ // PHASE 2 TASK 3: Load template from URL or sessionStorage
++ const params = new URLSearchParams(window.location.search);
++ const keyFromUrl = params.get("template") || sessionStorage.getItem("selectedTemplateKey");
++ 
++ if (keyFromUrl) {
++     window.loadTemplateByKey(keyFromUrl);
++ }
+
+LINES 53-62: Commented out
++ // PHASE 2 TASK 3: Commented out template selector population
++ /*
+  function populateTemplateSelector() {
+      ...
+  }
++ */
+
+LINE 65-66: Modified
+- document.getElementById("template-selector").addEventListener("change", handleTemplateChange);
++ // PHASE 2 TASK 3: Commented out template selector event listener
++ // document.getElementById("template-selector").addEventListener("change", handleTemplateChange);
+
+LINES 93-109: Added new function
++ // PHASE 2 TASK 3: Add unified template loader
++ window.loadTemplateByKey = function(templateKey) {
++     if (!templateKey || !window.templates || !window.templates[templateKey]) {
++         console.warn("Template not found:", templateKey);
++         return;
++     }
++ 
++     window.currentTemplateKey = templateKey;
++     window.currentTemplate = window.templates[templateKey];
++ 
++     // Reset all in-memory state
++     window.formData = {};
++     window.uploadedImages = {};
++ 
++     // Regenerate form + preview
++     if (typeof window.generateForm === "function") {
++         window.generateForm();
++     }
++     if (typeof window.updatePreview === "function") {
++         window.updatePreview();
++     }
++ };
+
+REASON: Added unified template loader API and URL/sessionStorage integration
+
+
+SUMMARY:
+--------
+- Removed legacy template-selector dropdown from HTML
+- Patched navigation.js to set template in window and sessionStorage
+- Added unified loadTemplateByKey function in app-core.js
+- Added URL parameter and sessionStorage support for template loading
+- Maintained backward compatibility where possible
+- No unrelated code modified

@@ -1,0 +1,86 @@
+EMAIL BRIEFING APP - CHANGE LOG
+=====================================
+Date: December 3, 2025
+Session: Hero Toggle & Export Fixes
+Implementer: Claude (MCP)
+
+CHANGES IMPLEMENTED:
+====================
+
+1. HERO BANNER TOGGLE FOR STANDARD TEMPLATE
+   ----------------------------------------
+   Location: Standard Template form (Main content section)
+   
+   Added Features:
+   - Toggle switch field type support in app-form.js
+   - New createToggleField() function for rendering toggle switches
+   - CSS styling for toggle switches in components.css
+   - Hero banner visibility controlled by "Show Hero Banner" toggle
+   
+   Files Modified:
+   - /js/app-form.js (added toggle field support + validation logic)
+   - /css/components.css (added toggle switch CSS styles)
+   - /js/templates/standard-template.js (updated preview to respect toggle)
+   
+   Behavior:
+   - Toggle ON (default): Hero banner and image upload field visible in preview
+   - Toggle OFF: Hero banner completely hidden from preview
+   - Validation skips hero-image requirement when toggle is OFF
+
+2. EXPORT WITHOUT PHOTOS FIX
+   --------------------------
+   Location: Validation system in app-form.js
+   
+   Problem Solved:
+   - Previously, exports would fail if required image fields were empty
+   - Hero-image was always required even when hero banner was hidden
+   
+   Solution:
+   - Updated validateCurrentDesign() function to conditionally check hero-image
+   - Hero-image only required when show-hero toggle is TRUE
+   - Missing images in other templates now show placeholder text in export
+   - Export process continues even with missing optional images
+   
+   Files Modified:
+   - /js/app-form.js (validation logic updated)
+
+TECHNICAL DETAILS:
+==================
+
+Toggle Field Implementation:
+- Field type: "toggle"
+- Storage: formData[field.id] = "true" or "false" (string values)
+- Default value: "true" for show-hero field
+- Event handling: Updates formData and preview on change
+- Supports design loading guards for safe state management
+
+Validation Logic:
+- Checks formData['show-hero'] value before validating hero-image
+- Skips hero-image validation when toggle is false
+- Maintains all other required field validations
+- Logs skip action for debugging
+
+CSS Toggle Switch:
+- Width: 56px, Height: 28px
+- Colors: Gray (off), Teladoc Purple #351F65 (on)
+- Smooth 0.3s transition animation
+- Hover and focus states included
+- Accessible with focus ring
+
+TESTING RECOMMENDATIONS:
+========================
+1. Test Standard Template with hero ON and OFF
+2. Verify preview updates when toggle changes
+3. Test export with hero OFF (should not require hero-image)
+4. Test save/load with toggle state preservation
+5. Verify validation messages appear/disappear correctly
+
+BACKWARD COMPATIBILITY:
+=======================
+- Existing saved designs without show-hero field will default to TRUE
+- initializeFormDataFromTemplate() handles missing toggle fields
+- Old templates continue to work without modification
+- New toggle field only affects Standard Template
+
+STATUS: ✅ COMPLETE
+Next Session: Test in browser and verify all functionality

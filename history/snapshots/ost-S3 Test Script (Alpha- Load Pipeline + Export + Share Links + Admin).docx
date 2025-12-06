@@ -1,0 +1,165 @@
+# Sprint C – Unlock Subject/Preview/URLs, Rename Fix, Duplicate Designs
+**Date:** November 24, 2025  
+**Environment:** Alpha build on S3, tested across multiple Macs (personal + Teladoc)
+
+---
+
+## Summary
+
+This sprint focused on three UX/data-integrity improvements:
+
+1. **Unlocked core messaging fields** so marketers can fully edit:
+   - Subject Line  
+   - Preview Text (preheader)  
+   - CTA URL fields  
+
+2. **Fixed the “Rename clears design” bug** so changing a design’s name no longer wipes the form or preview.
+
+3. **Added “Duplicate” to the design card context menu**, allowing quick cloning of designs into the same folder with incremented names.
+
+All features have been smoke-tested on multiple Macs and browsers using the current S3 build and are behaving as expected.
+
+---
+
+## 1. Editable Subject / Preview / URL Fields
+
+### What changed
+
+- **Template definitions**  
+  - Removed any `locked`, `readonly`, or similar flags from:
+    - Subject line fields  
+    - Preview/preheader text fields  
+    - CTA URL / link URL fields  
+  - These fields are now treated as normal editable fields across all templates.
+
+- **Form rendering logic**
+  - Removed special-case logic that forced these specific fields into `disabled` or “greyed out” states.
+  - Any remaining disable/lock behavior is now reserved for true system/metadata fields only (if present).
+
+### Behavior
+
+- Subject, preview text, and URL inputs:
+  - Render as fully editable (no grey styling).
+  - Accept user input normally.
+  - Sync changes into `formData` and the live preview.
+  - Save and load correctly via:
+    - My Designs
+    - File save/load
+    - Share links
+    - Exports
+
+### Status
+
+- ✅ Verified on multiple templates  
+- ✅ Verified across multiple Macs  
+- ✅ No regressions found in preview or export output
+
+---
+
+## 2. Rename Design – Data Preservation Fix
+
+### Previous bug
+
+- Renaming an existing design from the My Designs card:
+  - Cleared out form fields and preview content (text + images).
+  - Essentially behaved like a “new design” reset instead of a simple rename.
+
+### Fix
+
+- **Rename flow now:**
+  1. Loads the full existing design document from storage (IndexedDB / Firestore, depending on environment).
+  2. Creates an updated object that **only changes `projectName`**.
+  3. Writes that updated design back using the existing ID.
+  4. Keeps:
+     - `formData`
+     - `uploadedImages`
+     - template info
+     - timestamps and other metadata
+
+- **Folder metadata**  
+  - Where folder/item metadata maintains its own copy of the name, that value is updated as well so:
+    - The card label in My Designs shows the new name.
+    - The builder header shows the same updated name.
+
+### Behavior
+
+- Renaming:
+  - Updates only the name of the design.
+  - Leaves all content (text, images, URLs) intact.
+  - Does not create a new design or reset template state.
+
+### Status
+
+- ✅ Rename tested on multiple designs with rich content  
+- ✅ No data loss observed after rename + reopen  
+- ✅ Folder listings and builder header stay in sync
+
+---
+
+## 3. New “Duplicate” Action in Design Context Menu
+
+### UX
+
+- **Context menu on design cards** (right-click / control-click) now includes:
+  - Rename  
+  - Delete  
+  - **Duplicate** ✅ *(new)*
+
+- When a user chooses **Duplicate**:
+  - A new design is created in the **same folder** as the original.
+  - The new project name follows this pattern:
+    - `ExistingName_1`
+    - `ExistingName_2`
+    - `ExistingName_3`, etc., skipping any names that already exist.
+
+### Implementation Overview
+
+- The duplicate handler:
+  1. Loads the source design by its storage key.
+  2. Deep-copies the underlying design data (including `formData` and `uploadedImages`).
+  3. Computes a new project name using a helper that checks existing project names and appends `_1`, `_2`, etc. as needed.
+  4. Generates a **new design ID** (`email-project-<timestamp>` style).
+  5. Saves the cloned design under that new ID.
+  6. Adds the new design into the same folder’s `items` list.
+  7. Refreshes the folder view (where supported) so the duplicate appears immediately.
+
+### Behavior
+
+- The duplicate design:
+  - Opens with identical content (text + images, URLs, creative direction).
+  - Is fully independent of the original (separate ID and save history).
+- Original design remains unchanged.
+
+### Status
+
+- ✅ Single duplicate → correct `_1` naming, content preserved.
+- ✅ Multiple duplicates → `_1`, `_2`, `_3` naming verified.
+- ✅ Folder placement → duplicate always appears in the same folder as the original.
+
+---
+
+## Regression / Smoke Test Notes
+
+- **Share Links**
+  - Short `#share=<id>` links remain functional.
+  - Legacy `#design=<base64>` links still load correctly via the unified pipeline.
+- **Load Pipeline v2**
+  - `applyLoadedProject` still centralizes load behavior for:
+    - My Designs
+    - File load
+    - Share links
+    - Admin “Open Design”
+- **Multi-Mac Testing**
+  - Verified behavior on multiple machines and browsers pointing to the S3-hosted build.
+  - No environment-specific issues observed.
+
+---
+
+## Next Ideas / Future Sprints (Optional Notes)
+
+- Add a “Duplicate and Open” option that both clones and jumps straight into the builder.
+- Add soft-delete / restore for designs and shares via the existing trash/metadata system.
+- Add analytics hooks for:
+  - How often Duplicate is used.
+  - Rename frequency.
+  - Share link usage by template.

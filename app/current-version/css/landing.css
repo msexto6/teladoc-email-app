@@ -1,0 +1,224 @@
+/* ============================================
+   LANDING PAGE STYLES
+   ============================================ */
+
+#landing-screen {
+    overflow-y: hidden;
+    position: relative;
+    min-height: 100vh;
+    padding-top: 107px;
+}
+
+#landing-screen::before {
+    content: '';
+    position: fixed;
+    bottom: -276px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1640px;
+    height: 553px;
+    background-image: url('../assets/paver-combination-B.svg');
+    background-size: 1640px 553px;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.landing-container {
+    position: relative;
+    z-index: 1;
+    padding: 0 20px;
+    max-width: 800px;
+    margin: 180px auto 80px auto;
+    text-align: center;
+}
+
+/* Landing Page Headline */
+.landing-headline {
+    font-family: var(--font-primary);
+    font-weight: 300;
+    font-size: 36px;
+    color: #351F65;
+    text-align: center;
+    margin: 0 0 40px 0;
+}
+
+.landing-buttons {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 495px;
+    padding: 0 20px;
+    margin: 10px auto 40px auto;
+}
+
+.landing-btn {
+    transform: scale(0.9);
+    flex: 1;
+    padding: 18px 18px;
+    background: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 1.05em;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    transition: var(--transition-normal);
+}
+
+.landing-btn:hover {
+    transform: scale(0.975);
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+.landing-btn-text {
+    font-size: 1.05em;
+    font-weight: 700;
+}
+
+.search-container {
+    max-width: 495px;
+    padding: 0 20px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.search-input {
+    background: var(--color-white) !important;
+    width: 100%;
+    padding: 20px 30px;
+    border: 2px solid var(--color-primary-lighter);
+    border-radius: var(--radius-full);
+    font-size: 16px;
+    font-family: var(--font-primary);
+    transition: var(--transition-fast);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* Card Grids - 13px gap between cards */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 13px;
+    padding-bottom: 80px;
+}
+
+/* Icon-based card design */
+.template-card,
+.design-card {
+    background: transparent;
+    border: none;
+    padding: 10px;
+    cursor: default;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: center;
+}
+
+.template-card-content,
+.design-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    cursor: default;
+}
+
+.document-icon {
+    width: 41px;
+    height: 53px;
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.template-card:hover .document-icon,
+.design-card:hover .document-icon {
+    transform: scale(1.15);
+}
+
+.template-card-title,
+.design-card-title {
+    font-family: var(--font-primary);
+    font-size: 1.1em;
+    font-weight: 400;
+    color: #351F65;
+    margin: 0;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+    cursor: default;
+}
+
+/* Template cards hover berry */
+.template-card:hover .template-card-title {
+    color: #CA01BE;
+}
+
+/* Design cards hover purple */
+.design-card:hover .design-card-title {
+    color: #6240E8;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--color-gray);
+    font-size: 18px;
+    padding: 80px 20px;
+}
+
+/* Templates button - first button with solid purple background */
+#templates-btn {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: 2px solid var(--color-primary);
+}
+
+#templates-btn:hover {
+    background: #4f3196;
+    border-color: #4f3196;
+    color: var(--color-white);
+}
+
+/* TEMPLATE SELECTION & MY DESIGNS SCREENS */
+#template-selection-screen,
+#my-designs-screen {
+    position: relative;
+    min-height: 100vh;
+    padding-top: 220px;
+}
+
+#template-selection-screen::before,
+#my-designs-screen::before {
+    content: '';
+    position: fixed;
+    bottom: -276px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1640px;
+    height: 553px;
+    background-image: url('../assets/paver-combination-B.svg');
+    background-size: 1640px 553px;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#template-selection-screen .screen-container,
+#my-designs-screen .screen-container {
+    position: relative;
+    z-index: 1;
+    padding-top: 30px;
+    padding-bottom: 80px;
+}

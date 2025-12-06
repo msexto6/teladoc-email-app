@@ -1,0 +1,44 @@
+EXPORT PRELOADER TITLE SIZE FIX
+================================
+
+Date: Sunday, November 30, 2025
+Issue: "Building your export package…" text wrapping
+Status: FIXED ✅
+
+PROBLEM
+-------
+The export preloader title "Building your export package…" was wrapping to two lines because the text was too long for the modal width at 24px font size.
+
+SOLUTION
+--------
+Reduced the font size by 20% specifically for the export overlay title:
+- Original: 24px
+- New: 19.2px (24 * 0.8)
+
+This keeps the text on a single line without affecting other modal titles.
+
+CHANGE MADE
+-----------
+File: css/modals.css
+Location: After .export-overlay-state declaration
+
+Added:
+```css
+/* Export Overlay Title - 20% smaller to prevent wrapping */
+.export-overlay-state .modal-title {
+    font-size: 19.2px;
+}
+```
+
+SPECIFICITY
+-----------
+This rule specifically targets modal titles inside .export-overlay-state, so:
+✅ Export preloader: 19.2px (smaller, no wrap)
+✅ Export success modal: 19.2px (smaller, no wrap)  
+✅ All other modals: 24px (unchanged)
+
+The selector `.export-overlay-state .modal-title` has higher specificity than just `.modal-title`, so it overrides the default size only for export overlays.
+
+VISUAL RESULT
+-------------
+"Building your export package…" now displays on a single line with proper spacing and maintains the Effra Bold font family.

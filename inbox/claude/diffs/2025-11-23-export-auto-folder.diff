@@ -1,0 +1,86 @@
+DIFF: Export Modal Simplification – Auto-Folder Assignment
+============================================================
+
+FILE: js/app-firebase.js
+FUNCTION: saveExportMetadata()
+
+BEFORE:
+-------
+async saveExportMetadata(exportMeta) {
+    await this.waitForFirebase();
+    try {
+        const exportDoc = {
+            designId: exportMeta.designId || null,
+            designName: exportMeta.designName || 'Untitled',
+            templateKey: exportMeta.templateKey || null,
+            sizeBytes: exportMeta.sizeBytes || null,
+            fileName: exportMeta.fileName || null,
+            createdAt: exportMeta.createdAt || Date.now(),
+            timestamp: Date.now() // For ordering
+        };
+        
+        // Generate unique ID for export metadata
+        const exportId = 'export-meta-' + Date.now();
+        
+        await db.collection('exports').doc(exportId).set(exportDoc);
+        console.log('Export metadata saved:', exportDoc);
+        return true;
+    }
+
+AFTER:
+------
+async saveExportMetadata(exportMeta) {
+    await this.waitForFirebase();
+    try {
+        // Auto-determine folder from source design
+        let folderId = null;
+        
+        if (exportMeta.designId) {
+            try {
+                const sourceDesign = await this.getDesign(exportMeta.designId);
+                if (sourceDesign && sourceDesign.folderId) {
+                    folderId = sourceDesign.folderId;
+                    console.log(`📁 Export inheriting folder from design: ${folderId}`);
+                } else {
+                    console.log(`📁 Export defaulting to My Designs (root)`);
+                }
+            } catch (err) {
+                console.warn('Could not retrieve source design folder, defaulting to root:', err);
+            }
+        }
+        
+        const exportDoc = {
+            designId: exportMeta.designId || null,
+            designName: exportMeta.designName || 'Untitled',
+            templateKey: exportMeta.templateKey || null,
+            sizeBytes: exportMeta.sizeBytes || null,
+            fileName: exportMeta.fileName || null,
+            folderId: folderId, // Auto-assigned from source design
+            createdAt: exportMeta.createdAt || Date.now(),
+            timestamp: Date.now() // For ordering
+        };
+        
+        // Generate unique ID for export metadata
+        const exportId = 'export-meta-' + Date.now();
+        
+        await db.collection('exports').doc(exportId).set(exportDoc);
+        console.log('✅ Export metadata saved with auto-folder:', exportDoc);
+        return true;
+    }
+
+CHANGES SUMMARY:
+----------------
++ Added auto-folder determination logic
++ Fetches source design to inherit folderId
++ Defaults to null (My Designs) if no folder found
++ Added folderId field to export metadata document
++ Enhanced console logging for debugging
++ Updated function JSDoc to document auto-folder behavior
+
+DATAFLOW:
+---------
+1. exportAsExcel() calls saveExportMetadata() with designId
+2. saveExportMetadata() fetches source design from Firestore
+3. Reads folderId from source design (or uses null as default)
+4. Saves export metadata with inherited folderId
+5. Admin panel queries exports by folderId for filtering

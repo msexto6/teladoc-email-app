@@ -1,0 +1,50 @@
+PHASE 1 - TASK 1 DIFF
+=====================
+File: js/app-firebase.js
+Timestamp: 2025-11-21_19:37:00
+Operation: Add Firebase Storage Upload Helper
+
+CHANGES MADE:
+-------------
+Added new section after UTILITY FUNCTIONS:
+
++ // ============================================
++ // FIREBASE STORAGE - IMAGE UPLOAD
++ // ============================================
++ 
++ async uploadImage(file) {
++     await this.waitForFirebase();
++     try {
++         const uniqueName = 'images/' + Date.now() + '-' + file.name;
++         const storageRef = firebase.storage().ref().child(uniqueName);
++         await storageRef.put(file);
++         const downloadURL = await storageRef.getDownloadURL();
++         console.log('✓ Image uploaded to Firebase Storage:', uniqueName);
++         return downloadURL;
++     } catch (error) {
++         console.error('✗ Failed to upload image:', error);
++         throw error;
++     }
++ }
+
+LOCATION:
+---------
+Added to EmailBriefingDB object as a new method
+Maintains existing export pattern
+No changes to existing functions
+
+PURPOSE:
+--------
+This helper function will:
+1. Accept a File object
+2. Generate a unique filename with timestamp
+3. Upload to Firebase Storage under 'images/' path
+4. Return the download URL for storage in Firestore
+
+VERIFICATION:
+-------------
+✓ Function added to EmailBriefingDB object
+✓ Uses same async/await pattern as other methods
+✓ Includes error handling
+✓ Includes console logging for debugging
+✓ No existing code modified

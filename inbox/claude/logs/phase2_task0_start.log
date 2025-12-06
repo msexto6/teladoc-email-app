@@ -1,0 +1,20 @@
+PHASE 2 - TASK 0: TEMPLATE SELECTION FIX
+=========================================
+Start Time: 2025-01-24 14:00:00
+Implementer: Claude
+Task Source: GPT-5.1
+
+TASK SCOPE:
+-----------
+Fix template-loader behavior in 3 steps:
+1. Add missing event listener for template loading
+2. Make template selector visible again  
+3. Prevent loadDesign() from wiping out template ID
+
+FILES TO MODIFY:
+----------------
+1. /Users/marksexton/Desktop/Email-Briefing-App/index.html
+2. /Users/marksexton/Desktop/Email-Briefing-App/css/styles.css
+3. /Users/marksexton/Desktop/Email-Briefing-App/js/app-save-load.js
+
+STATUS: STARTING

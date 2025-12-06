@@ -1,0 +1,165 @@
+==============================================
+ADMIN PANEL - QUICK REFERENCE GUIDE
+==============================================
+
+ACCESSING THE ADMIN PANEL
+--------------------------
+1. Navigate to "My Designs" or "Templates" page
+2. Look at the subnav ribbon (gray paver area below masthead)
+3. Click the CENTER of the ribbon (below the page title)
+   - Click target is 120px wide × 48px tall
+   - Located 12px from bottom of ribbon
+   - Completely invisible (no visual indicator)
+4. Admin panel will open as a modal overlay
+
+ADMIN PANEL LAYOUT
+------------------
+Header:
+- Title: "Admin – Export History"
+- Close button (×) in top-right corner
+
+Body:
+- Filter summary: "Showing X exports from the last 7 days"
+- Table with columns:
+  * Time - Formatted date/time of export
+  * User - Name of user who exported (or "Unknown")
+  * Design - Name of the email project
+  * Template - Template type used
+  * Folder - Folder path (or "—" if none)
+  * Size - File size in KB
+  * Action - "Open design" button
+
+CLOSING THE PANEL
+------------------
+Method 1: Click the × button in header
+Method 2: Click anywhere on the dark backdrop
+Method 3: Press ESC key (not implemented yet)
+
+CURRENT FUNCTIONALITY
+---------------------
+✓ View last 7 days of exports
+✓ See export metadata (time, user, size, etc.)
+✓ Formatted date/time display
+✓ File sizes converted to KB
+✓ Folder paths displayed with " / " separators
+✓ Scrollable table for long lists
+
+LIMITATIONS (TODO)
+------------------
+⚠ "Open design" button shows placeholder alert
+⚠ Hard-coded 7-day date range (no UI controls)
+⚠ No authentication or permission checks
+⚠ No pagination for >20 results
+⚠ No search or filter functionality
+⚠ Cannot download exports again
+⚠ No export error logs displayed
+
+SECURITY NOTES
+--------------
+⚠ Currently accessible to ALL users
+⚠ No authentication required
+⚠ Hotspot location is only "security"
+⚠ Suitable for trusted team environments only
+⚠ Should NOT be deployed to public instances
+
+Optional: Enable Shift+click requirement
+- Uncomment lines in app-admin.js:
+  // if (!event.shiftKey) return;
+- This requires holding Shift while clicking hotspot
+
+TECHNICAL DETAILS
+-----------------
+Firebase Query:
+- Collection: 'exports'
+- Filter: createdAt >= startDate AND <= endDate
+- Order: createdAt descending (newest first)
+- Returns: Array of export metadata objects
+
+Export Metadata Fields:
+- designId: Source design ID
+- designName: Project name
+- templateKey: Template identifier
+- sizeBytes: ZIP file size in bytes
+- fileName: Download filename
+- createdAt: Export timestamp (ms)
+- userName: User who exported (optional)
+- folderPath: Array of folder names (optional)
+
+TROUBLESHOOTING
+---------------
+Issue: Admin panel doesn't open
+→ Check console for JavaScript errors
+→ Verify app-admin.js is loaded
+→ Ensure Firebase is initialized
+→ Try clicking exact center of subnav ribbon
+
+Issue: "Failed to load export history"
+→ Check Firebase connection
+→ Verify exports collection exists
+→ Check console for error details
+→ Ensure user has Firestore read permissions
+
+Issue: Table is empty
+→ Verify exports exist in last 7 days
+→ Check if saveExportMetadata() is being called
+→ Inspect Firestore console for export documents
+→ Check createdAt field format (should be timestamp)
+
+Issue: "Open design" doesn't work
+→ This is expected (placeholder implementation)
+→ Shows alert with design ID for testing
+→ Full integration not yet implemented
+
+DEVELOPER NOTES
+---------------
+Files Involved:
+- /js/app-admin.js - Admin panel logic
+- /js/app-firebase.js - getExportLogs() function
+- /css/masthead.css - Admin panel styles
+- /index.html - Modal markup + hotspot elements
+
+Key Functions:
+- openAdminPanel() - Shows modal
+- closeAdminPanel() - Hides modal
+- loadExportHistory() - Fetches from Firebase
+- renderExportHistoryTable() - Generates HTML
+- EmailBriefingDB.getExportLogs() - Queries Firestore
+
+Event Listeners:
+- Admin hotspot clicks (2 elements)
+- Close button click
+- Backdrop click
+- "Open design" button clicks (delegated)
+
+CSS Classes:
+- .admin-panel (modal container)
+- .admin-panel__backdrop (dark overlay)
+- .admin-panel__content (white panel)
+- .admin-panel__header (title + close)
+- .admin-panel__body (scrollable content)
+- .admin-table (export history table)
+- .admin-open-design-btn (action buttons)
+
+FUTURE ENHANCEMENTS
+-------------------
+Priority 1:
+□ Implement openDesignFromAdmin() properly
+□ Update export functions to save metadata
+□ Add folder path resolution
+
+Priority 2:
+□ Add date range picker UI
+□ Implement pagination
+□ Add search/filter controls
+□ Show export error logs
+
+Priority 3:
+□ User authentication checks
+□ Role-based access control
+□ Audit log of admin access
+□ "Download again" functionality
+□ Export statistics dashboard
+
+==============================================
+END OF QUICK REFERENCE
+==============================================

@@ -1,0 +1,285 @@
+/* ============================================
+   MASTHEAD & NAVIGATION
+   ============================================ */
+
+.masthead {
+    background: var(--color-white);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+.masthead-content {
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.masthead-logo {
+    height: 47px;
+}
+
+.masthead-title {
+    font-family: var(--font-primary);
+    font-size: 23.75px;
+    font-weight: 400;
+    color: var(--color-primary-dark);
+    margin: 0;
+    padding-left: 20px;
+    border-left: 1px solid var(--color-primary-dark);
+}
+
+/* Alpha Badge Superscript */
+.alpha-badge {
+    font-family: var(--font-primary);
+    font-weight: 300;
+    font-size: 10px;
+    color: var(--color-primary);
+    margin-left: 4px;
+    vertical-align: super;
+    line-height: 0;
+}
+
+/* Hamburger menu (hidden on desktop) */
+.hamburger {
+    display: none;
+}
+
+/* NAVIGATION MENU */
+.nav-menu {
+    display: flex;
+    gap: 42px;
+    align-items: center;
+    margin-left: auto;
+}
+
+.nav-item {
+    position: relative;
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 17.25px;
+    color: #351F65;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding-bottom: 4px;
+}
+
+.nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 3px;
+    background: #6240E8;
+    transition: width 0.3s ease-out;
+}
+
+/* Show active state when menu is not being hovered */
+.nav-menu:not(:hover) .nav-item.active {
+    color: #6240E8;
+}
+
+.nav-menu:not(:hover) .nav-item.active::after {
+    width: 100%;
+}
+
+/* Show underline and color on hovered item when menu is being hovered */
+.nav-menu:hover .nav-item:hover {
+    color: #6240E8;
+}
+
+.nav-menu:hover .nav-item:hover::after {
+    width: 100%;
+}
+
+/* Templates dropdown menu */
+.nav-item-with-dropdown {
+    position: relative;
+}
+
+.templates-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: -2px; /* Slight overlap to eliminate any pixel seam */
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    padding: 15px 0; /* Simple padding, no fade needed */
+    width: auto;
+    z-index: 200; /* Above everything */
+    overflow: hidden;
+    
+    /* Initial state - controlled by GSAP */
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: auto;
+}
+
+.templates-dropdown-item {
+    position: relative;
+    padding: 12px 20px;
+    color: var(--color-primary-dark);
+    font-family: var(--font-primary);
+    font-size: 15px;
+    cursor: pointer;
+    white-space: nowrap;
+    z-index: 2;
+    text-align: left;
+    transition: background-color 0.15s ease;
+}
+
+.templates-dropdown-item:hover {
+    background: var(--color-primary-lightest);
+    color: var(--color-primary);
+}
+
+/* ============================================
+   MASTHEAD SUB-NAVIGATION (My Designs)
+   ============================================ */
+
+.masthead-subnav {
+    background: #F8F7FB;
+    border-top: 1px solid #E5E1F0;
+    position: relative; /* For absolute positioning of admin hotspot */
+}
+
+.masthead-subnav-content {
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.masthead-subnav-title {
+    font-family: var(--font-primary);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    margin: 0;
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb-segment {
+    display: inline;
+    color: var(--color-primary-dark);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.breadcrumb-segment:hover {
+    color: var(--color-primary);
+    background: rgba(98, 64, 232, 0.08);
+}
+
+.breadcrumb-segment.drag-over {
+    background: var(--color-primary);
+    color: white;
+}
+
+.breadcrumb-separator {
+    display: inline;
+    color: #B5A9D0;
+    margin: 0 8px;
+    user-select: none;
+    pointer-events: none;
+    font-weight: 400;
+}
+
+.masthead-subnav-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.new-folder-btn {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-family: var(--font-primary);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.new-folder-btn:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+}
+
+.trash-bin {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.trash-bin:hover {
+    opacity: 0.7;
+}
+
+.trash-bin img {
+    width: 29px;
+    height: 29px;
+    transition: var(--transition-fast);
+}
+
+.trash-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #FF4757;
+    color: white;
+    font-family: var(--font-primary);
+    font-size: 11px;
+    font-weight: 600;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+}
+
+/* ============================================
+   ADMIN ACCESS HOTSPOT (Hidden)
+   ============================================ */
+
+.admin-access-hotspot,
+#admin-access-hotspot,
+#admin-access-hotspot-mydesigns {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 12px;
+    width: 120px;
+    height: 48px;
+    cursor: pointer;
+    background: transparent;
+    z-index: 10;
+}
+
+/* Optional visual debug - remove in production */
+/* .admin-access-hotspot:hover {
+    background: rgba(98, 64, 232, 0.05);
+} */

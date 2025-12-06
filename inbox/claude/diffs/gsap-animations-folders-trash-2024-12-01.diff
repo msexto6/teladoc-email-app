@@ -1,0 +1,187 @@
+GSAP ANIMATION IMPLEMENTATION - FOLDERS-TRASH.JS
+================================================
+Date: December 1, 2024
+File: js/folders-trash.js
+Task: Apply GSAP animations to 5 remaining modal functions
+
+CHANGES MADE:
+
+1. closeFolderColorModal() (~line 408)
+   BEFORE:
+   ```javascript
+   function closeFolderColorModal() {
+       const modal = document.getElementById('folder-color-modal');
+       if (modal) {
+           modal.classList.remove('active');
+       }
+   }
+   ```
+   
+   AFTER:
+   ```javascript
+   /**
+    * GSAP ANIMATION: Close folder color modal with smooth animation
+    */
+   function closeFolderColorModal() {
+       const modal = document.getElementById('folder-color-modal');
+       if (modal) {
+           if (typeof window.animateModalClose === 'function') {
+               window.animateModalClose(modal, () => {
+                   modal.classList.remove('active');
+               });
+           } else {
+               modal.classList.remove('active');
+           }
+       }
+   }
+   ```
+
+2. openTrashModal() (~line 963)
+   BEFORE:
+   ```javascript
+   function openTrashModal() {
+       const modal = document.getElementById('trash-modal');
+       if (!modal) return;
+       
+       const itemsGrid = document.getElementById('trash-items-grid');
+       itemsGrid.innerHTML = `...`;
+       
+       modal.classList.add('active');
+   }
+   ```
+   
+   AFTER:
+   ```javascript
+   /**
+    * GSAP ANIMATION: Open trash modal with smooth animation
+    */
+   function openTrashModal() {
+       const modal = document.getElementById('trash-modal');
+       if (!modal) return;
+       
+       const itemsGrid = document.getElementById('trash-items-grid');
+       itemsGrid.innerHTML = `...`;
+       
+       if (typeof window.animateModalOpen === 'function') {
+           window.animateModalOpen(modal);
+       } else {
+           modal.classList.add('active');
+       }
+   }
+   ```
+
+3. closeTrashModal() (~line 981)
+   BEFORE:
+   ```javascript
+   function closeTrashModal() {
+       const modal = document.getElementById('trash-modal');
+       if (modal) {
+           modal.classList.remove('active');
+       }
+   }
+   ```
+   
+   AFTER:
+   ```javascript
+   /**
+    * GSAP ANIMATION: Close trash modal with smooth animation
+    */
+   function closeTrashModal() {
+       const modal = document.getElementById('trash-modal');
+       if (modal) {
+           if (typeof window.animateModalClose === 'function') {
+               window.animateModalClose(modal, () => {
+                   modal.classList.remove('active');
+               });
+           } else {
+               modal.classList.remove('active');
+           }
+       }
+   }
+   ```
+
+4. closeDeleteModal() (~line 1107)
+   BEFORE:
+   ```javascript
+   function closeDeleteModal() {
+       const modal = document.getElementById('delete-modal');
+       if (modal) {
+           modal.classList.remove('active');
+           modal.setAttribute('aria-hidden', 'true');
+       }
+       pendingDeleteKey = null;
+       pendingDeleteFolderId = null;
+   }
+   ```
+   
+   AFTER:
+   ```javascript
+   /**
+    * SPRINT M + GSAP: Close the delete modal with smooth animation
+    */
+   function closeDeleteModal() {
+       const modal = document.getElementById('delete-modal');
+       if (modal) {
+           if (typeof window.animateModalClose === 'function') {
+               window.animateModalClose(modal, () => {
+                   modal.classList.remove('active');
+                   modal.setAttribute('aria-hidden', 'true');
+               });
+           } else {
+               modal.classList.remove('active');
+               modal.setAttribute('aria-hidden', 'true');
+           }
+       }
+       pendingDeleteKey = null;
+       pendingDeleteFolderId = null;
+   }
+   ```
+
+5. closeRenameModal() (~line 1358)
+   BEFORE:
+   ```javascript
+   function closeRenameModal() {
+       const modal = document.getElementById('rename-modal');
+       if (modal) {
+           modal.classList.remove('active');
+           modal.setAttribute('aria-hidden', 'true');
+       }
+       renameTargetKey = null;
+       renameTargetFolderId = null;
+   }
+   ```
+   
+   AFTER:
+   ```javascript
+   /**
+    * Close the rename modal with smooth GSAP animation
+    */
+   function closeRenameModal() {
+       const modal = document.getElementById('rename-modal');
+       if (modal) {
+           if (typeof window.animateModalClose === 'function') {
+               window.animateModalClose(modal, () => {
+                   modal.classList.remove('active');
+                   modal.setAttribute('aria-hidden', 'true');
+               });
+           } else {
+               modal.classList.remove('active');
+               modal.setAttribute('aria-hidden', 'true');
+           }
+       }
+       renameTargetKey = null;
+       renameTargetFolderId = null;
+   }
+   ```
+
+HEADER COMMENT UPDATE:
+Added "GSAP ANIMATIONS: All modals now use smooth GSAP animations" to file header
+
+PATTERN APPLIED:
+- All modal close functions use animateModalClose with callback
+- openTrashModal uses animateModalOpen for opening
+- Graceful fallback if GSAP functions not available
+- All cleanup code preserved in callbacks
+
+STATUS: ✅ COMPLETE
+All 5 functions now have smooth GSAP animations applied.

@@ -1,0 +1,111 @@
+TASK H - REMOVE LEGACY TEMPLATE-SELECTOR DEPENDENCY
+====================================================
+Date: 2025-01-XX
+File: js/app-save-load.js
+Goal: Prevent crashes when legacy template-selector element is absent
+
+CHANGES MADE
+============
+
+Modified 3 functions to use null-safe template selector access:
+
+1. loadProjectFromComputer() - Line ~260
+   OLD:
+     document.getElementById("template-selector").value = templateKey;
+   
+   NEW:
+     const templateSelector = document.getElementById("template-selector");
+     if (templateSelector) {
+         templateSelector.value = templateKey;
+     }
+
+2. loadProject() - Line ~340
+   OLD:
+     document.getElementById("template-selector").value = templateKey;
+   
+   NEW:
+     const templateSelector = document.getElementById("template-selector");
+     if (templateSelector) {
+         templateSelector.value = templateKey;
+     }
+
+3. loadDesignFromCard() - Line ~747
+   OLD:
+     document.getElementById("template-selector").value = templateKey;
+   
+   NEW:
+     const templateSelector = document.getElementById("template-selector");
+     if (templateSelector) {
+         templateSelector.value = templateKey;
+     }
+
+BEHAVIOR IMPROVEMENTS
+======================
+
+Before (Brittle):
+- Would crash with "Cannot set properties of null (setting 'value')" if:
+  * template-selector element removed from HTML
+  * Element ID changed during refactoring
+  * DOM not fully loaded when function runs
+- No graceful degradation
+
+After (Hardened):
+- Never crashes on missing template-selector
+- Silently skips update if element absent
+- App continues to function normally
+- Template still loads correctly via currentTemplate/currentTemplateKey globals
+
+RATIONALE
+=========
+
+The template-selector is a legacy UI element that may be:
+- Removed in future refactoring
+- Not present in all app contexts
+- Replaced with different selection mechanism
+
+The critical state is tracked via window.currentTemplateKey, so the selector update is non-essential for functionality. Making this null-safe prevents brittle dependencies on UI elements.
+
+SCOPE ADHERENCE
+===============
+
+✅ Only touched app-save-load.js
+✅ Only modified 3 load functions
+✅ No new behavior added
+✅ Pure defensive programming
+✅ No architecture changes
+
+TESTING RECOMMENDATIONS
+========================
+
+1. Normal Operation Test:
+   - Load existing saved design
+   - Expected: Works exactly as before, selector updates
+
+2. Missing Element Test (requires HTML modification):
+   - Temporarily remove <select id="template-selector"> from HTML
+   - Try loading a saved design
+   - Expected: No crash, design loads correctly
+
+3. Regression Test:
+   - All load paths still work:
+     * My Designs card click
+     * Load from computer
+     * Legacy file input
+
+ACCEPTANCE CRITERIA MET
+========================
+
+✅ Prevents crashes when template-selector is absent
+✅ No new behavior added
+✅ All existing functionality preserved
+✅ Minimal code change (defensive only)
+
+FILES MODIFIED
+==============
+- /Users/marksexton/Desktop/Email-Briefing-App/js/app-save-load.js
+
+LINES CHANGED
+=============
+- Modified: 3 locations (1 line → 4 lines each)
+- Total additions: ~9 lines
+- Total changes: 3 replacements

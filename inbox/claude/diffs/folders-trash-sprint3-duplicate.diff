@@ -1,0 +1,34 @@
+--- a/js/folders-trash.js
++++ b/js/folders-trash.js
+@@ -1,6 +1,7 @@
+ /**
+  * Folders & Trash Management - Firebase Version
+  * Handles folder creation, organization, and trash bin functionality
+  * PHASE 3 UPDATE: Export cards removed from marketer UI - only visible in Admin panel
++ * SPRINT 3: Added Duplicate functionality for design cards
+  */
+
+@@ -757,6 +758,7 @@ function showFolderContextMenu(event, folderId) {
+ }
+
++/**
++ * SPRINT 3: Updated to include Duplicate option for designs
++ * Shows context menu with Rename, Duplicate, and Delete options
++ */
+ function showDesignContextMenu(event, itemKey, itemType) {
+     const existingMenu = document.querySelector('.folder-context-menu');
+     if (existingMenu) existingMenu.remove();
+@@ -769,9 +771,11 @@ function showDesignContextMenu(event, itemKey, itemType) {
+     
+     let menuHTML = '';
+     
+-    // Only show Rename for designs (not exports)
++    // Only show Rename and Duplicate for designs (not exports)
+     if (itemType === 'design') {
+         menuHTML += `<div class="context-menu-item" onclick="renameDesign('${itemKey}')">Rename</div>`;
++        // SPRINT 3: Add Duplicate option - get current folder ID for placement
++        const currentFolderId = getCurrentFolderId();
++        menuHTML += `<div class="context-menu-item" onclick="duplicateDesignFromCard('${itemKey}', '${currentFolderId || ''}')">Duplicate</div>`;
+     }
+     
+     menuHTML += `<div class="context-menu-item danger" onclick="deleteItemDirectly('${itemKey}')">Delete</div>`;

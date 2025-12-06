@@ -1,0 +1,75 @@
+EMAIL BRIEFING APP - CROSS-SESSION INSTRUCTIONS
+================================================
+
+⚠️ CRITICAL: READ THIS FIRST BEFORE EDITING ANY FILES ⚠️
+
+PROJECT LOCATION: /Users/marksexton/Desktop/Email-Briefing-App/
+
+FILE EDITING PROTOCOL:
+----------------------
+❌ NEVER use osascript + sed for JavaScript files (causes corruption)
+✅ ALWAYS use: Filesystem:read_file → modify in memory → Filesystem:write_file
+
+Full documentation: /Users/marksexton/Desktop/Email-Briefing-App/EDITING-PROTOCOL.md
+
+MODULAR ARCHITECTURE:
+--------------------
+The app is split into small, manageable modules:
+
+js/templates.js                    - Template field definitions (60 lines)
+js/app.js                          - Core application controller (400 lines)
+js/templates/webinar-invite.js     - Invite preview renderer (100 lines)
+js/templates/webinar-reg-confirmation.js - Confirmation renderer (50 lines)  
+js/templates/webinar-reminder.js   - Reminder preview renderer (50 lines)
+
+WHY THIS MATTERS:
+- Small files = fast and safe to read/write entirely
+- No sed escaping nightmares
+- 100% reliable editing process
+
+QUICK REFERENCE - EDITING A FILE:
+----------------------------------
+1. Read: Filesystem:read_file with path
+2. Modify: String operations in memory  
+3. Write: Filesystem:write_file with path and modified content
+
+EXAMPLE - Update webinar reminder preview:
+-------------------------------------------
+// 1. Read
+Filesystem:read_file
+  path: /Users/marksexton/Desktop/Email-Briefing-App/js/templates/webinar-reminder.js
+
+// 2. Modify in memory (example: change text)
+content = content.replace("old pattern", "new pattern")
+
+// 3. Write
+Filesystem:write_file
+  path: /Users/marksexton/Desktop/Email-Briefing-App/js/templates/webinar-reminder.js
+  content: [modified content]
+
+ADDING A NEW TEMPLATE:
+----------------------
+1. Update js/templates.js (add template definition)
+2. Create js/templates/[name].js (create renderer function)
+3. Update index.html (add script tag)
+4. Update js/app.js (add routing case)
+
+All using Read → Modify → Write pattern.
+
+TESTING:
+--------
+After any file change:
+1. Reload browser (Cmd+Shift+R for hard refresh)
+2. Check console for errors (Cmd+Option+J)
+3. Select template and verify preview works
+
+BACKUPS:
+--------
+Archive folder contains backups: /Users/marksexton/Desktop/Email-Briefing-App/archive/
+Before major edits, create backup:
+  osascript: do shell script "cp [source] [source].backup"
+
+KEY TAKEAWAY:
+-------------
+The modular architecture + Read/Modify/Write pattern = reliable, scalable editing.
+Never fight with sed again.

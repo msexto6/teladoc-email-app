@@ -1,0 +1,63 @@
+# PHASE 3 TASK F - DIFF
+## Restore Footer Action Buttons Visibility
+
+**File:** `css/styles.css`  
+**Lines Changed:** 2 (one change, one comment)  
+**Date:** November 22, 2025
+
+---
+
+## BEFORE (Lines ~788-796):
+
+```css
+.action-buttons {
+    display: none;
+    gap: 15px;
+    margin-top: var(--spacing-lg);
+}
+
+.action-buttons.active {
+    display: flex;
+}
+```
+
+---
+
+## AFTER (with PHASE 3 TASK F changes):
+
+```css
+/* PHASE 3 TASK F: Footer action buttons (Save, Save As, Copy Link, Export) */
+.action-buttons {
+    display: flex;           /* Was: display: none; */
+    gap: 15px;
+    margin-top: var(--spacing-lg);
+}
+
+/* Keep .active as a no-op alias for future conditional styling */
+.action-buttons.active {
+    display: flex;
+}
+```
+
+---
+
+## Summary of Changes:
+
+**Line Changes:**
+1. Added comment above `.action-buttons` rule explaining purpose
+2. Changed `display: none;` to `display: flex;` 
+3. Added inline comment showing previous value
+4. Added comment above `.action-buttons.active` explaining it's kept as no-op alias
+
+**Result:**
+- Footer action buttons now always visible (display: flex)
+- `.active` class kept for potential future conditional styling
+- No structural changes to HTML or JavaScript
+- Minimal, surgical CSS-only change
+
+**Impact:**
+- Save button visible
+- Save As button visible  
+- Copy Link button visible
+- Export button visible
+- All buttons function correctly (already wired in app-core.js)

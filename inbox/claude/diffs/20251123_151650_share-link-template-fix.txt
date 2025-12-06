@@ -1,0 +1,128 @@
+SHARE LINK TEMPLATE KEY FIX - DIFF LOG
+========================================
+Timestamp: 2025-11-23 15:16:50
+Sprint: 11.23.25-9am
+Task: Fix share link flow to correctly set template globals
+
+FILE: js/app-share-link.js
+VERSION: 1.3 → 1.4
+
+PROBLEM:
+--------
+When loading from share link URL:
+- Preview showed correctly (right template + data)
+- Form showed incorrectly (generic/empty fields)
+- Console: "generateForm: no templateKey provided or inferred"
+- Root cause: template key globals not being set before generateForm()
+
+CHANGES MADE:
+-------------
+
+1. Added local templateKey variable (line ~193):
+   BEFORE:
+   // Load the template
+   currentTemplate = templates[shareData.template];
+   
+   AFTER:
+   // Determine template key from shared data
+   const templateKey = shareData.template;
+
+2. Set global template state (lines ~194-199):
+   ADDED:
+   // Set global template state
+   window.currentTemplateKey = templateKey;
+   window.currentTemplate    = templates[templateKey];
+
+   currentTemplateKey = templateKey;
+   currentTemplate    = window.currentTemplate;
+
+3. Enhanced console logging (lines ~208-211):
+   BEFORE:
+   console.log('✓ Data loaded into memory');
+   console.log('formData keys:', Object.keys(window.formData));
+   console.log('uploadedImages keys:', Object.keys(window.uploadedImages));
+   
+   AFTER:
+   console.log('✓ Data loaded into memory');
+   console.log('templateKey:', templateKey);
+   console.log('currentTemplateKey:', window.currentTemplateKey);
+   console.log('formData keys:', Object.keys(window.formData));
+   console.log('uploadedImages keys:', Object.keys(window.uploadedImages));
+
+4. Explicit generateForm call with parameters (line ~225):
+   BEFORE:
+   // Generate form with loaded data
+   generateForm();
+   
+   AFTER:
+   // Build the correct form for this shared template
+   generateForm(templateKey, window.currentTemplate);
+
+5. Replaced populateFormFields with applySaved* functions (lines ~230-240):
+   BEFORE:
+   setTimeout(() => {
+       try {
+           populateFormFields();
+           console.log('✓ Form fields populated');
+   
+   AFTER:
+   setTimeout(() => {
+       try {
+           if (typeof applySavedFormDataToDOM === 'function') {
+               applySavedFormDataToDOM(window.formData);
+               console.log('✓ Form data applied to DOM');
+           }
+           if (typeof applySavedImagesToDOM === 'function') {
+               applySavedImagesToDOM(window.uploadedImages);
+               console.log('✓ Images applied to DOM');
+           }
+
+6. Updated version number:
+   BEFORE: version: '1.3'
+   AFTER:  version: '1.4'
+
+EXPECTED BEHAVIOR AFTER FIX:
+----------------------------
+✓ Share link preview shows correct template layout
+✓ Share link form shows correct template fields
+✓ All form fields are populated with saved data
+✓ Console logs show correct templateKey values
+✓ No "no templateKey provided" warnings
+
+TEST CHECKLIST:
+---------------
+[ ] Create email with template (e.g., Consultant Connect NL)
+[ ] Click "Copy Link"
+[ ] Paste link in fresh browser window/tab
+[ ] Verify page title matches template
+[ ] Verify preview panel shows correct template
+[ ] Verify form panel shows template-specific fields
+[ ] Verify all fields are populated with saved data
+[ ] Check console for templateKey logs (should show correct key)
+[ ] Check console for errors (should be none)
+
+FILES MODIFIED:
+--------------
+- js/app-share-link.js (complete rewrite with fixes)
+
+DEPENDENCIES:
+-------------
+Requires these globals to exist:
+- window.formData (object)
+- window.uploadedImages (object)
+- window.currentTemplateKey (string)
+- window.currentTemplate (object)
+- templates (object with all template definitions)
+- generateForm(templateKey, templateDef) (function)
+- applySavedFormDataToDOM(data) (function)
+- applySavedImagesToDOM(images) (function)
+
+ARCHITECTURE NOTES:
+-------------------
+This fix ensures proper global state initialization in the share link
+loading path. The key insight is that generateForm() needs explicit
+template parameters when loading from URL, since the normal template
+selection flow (which sets these globals) is bypassed.
+
+The setTimeout(150ms) gives the DOM time to create form elements before
+we attempt to populate them with saved data.

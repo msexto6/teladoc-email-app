@@ -1,0 +1,188 @@
+PHASE 2 – TASK A: SYNTAX ERROR FIX AND TEMPLATE LOADER HARDENING
+================================================================
+
+Timestamp: 2025-11-22 17:03:34
+Task ID: phase2-taskA
+Files Modified: 2
+
+FILE 1: js/app-form.js
+======================
+
+CHANGE: Removed duplicate else block causing syntax error
+
+BEFORE (lines ~284-303):
+```javascript
+        // Add character counter UI only if maxChars is specified
+        if(field.maxChars) {
+            const counter = document.createElement("div");
+            counter.className = "char-counter";
+            counter.innerHTML = `
+                <span class="char-count">0 / \${field.maxChars}</span>
+                <div class="char-progress-bar">
+                    <div class="char-progress-fill safe" style="width:0%"></div>
+                </div>
+            `;
+            div.appendChild(counter);
+        }
+        } else {
+            input.addEventListener("input", e => {
+                console.log(`📝 Text field "${field.id}" (no maxChars) updated to: "${e.target.value}"`);
+                formData[field.id] = e.target.value;
+                console.log(`   Current formData keys: [${Object.keys(formData).join(', ')}]`);
+                updatePreview();
+            });
+        }
+```
+
+AFTER (lines ~284-295):
+```javascript
+        // Add character counter UI only if maxChars is specified
+        if(field.maxChars) {
+            const counter = document.createElement("div");
+            counter.className = "char-counter";
+            counter.innerHTML = `
+                <span class="char-count">0 / ${field.maxChars}</span>
+                <div class="char-progress-bar">
+                    <div class="char-progress-fill safe" style="width:0%"></div>
+                </div>
+            `;
+            div.appendChild(counter);
+        }
+```
+
+RATIONALE:
+- The duplicate else block was causing "Uncaught SyntaxError: Unexpected token 'else'"
+- The legacy else branch was redundant because input listeners are now always attached in the main block (line ~276)
+- Removing this branch eliminates the syntax error while preserving all functionality
+
+
+FILE 2: js/app-core.js
+======================
+
+CHANGE: Replaced basic loadTemplateByKey with hardened version with diagnostics
+
+BEFORE (lines ~102-115):
+```javascript
+window.loadTemplateByKey = function(templateKey) {
+    if (!templateKey || !window.templates || !window.templates[templateKey]) {
+        console.warn("Template not found:", templateKey);
+        return;
+    }
+
+    window.currentTemplateKey = templateKey;
+    window.currentTemplate = window.templates[templateKey];
+
+    // Reset all in-memory state
+    window.formData = {};
+    window.uploadedImages = {};
+
+    // Regenerate form + preview
+    if (typeof window.generateForm === "function") {
+        window.generateForm();
+    }
+    if (typeof window.updatePreview === "function") {
+        window.updatePreview();
+    }
+};
+```
+
+AFTER (lines ~102-158):
+```javascript
+window.loadTemplateByKey = function(templateKey) {
+    console.log("🔍 loadTemplateByKey called with:", templateKey);
+    
+    // Normalize and validate the key
+    const key = (templateKey || "").trim();
+    if (!key) {
+        console.error("❌ loadTemplateByKey: Empty or invalid template key provided");
+        return;
+    }
+    
+    // Try multiple possible template source locations
+    const allTemplates = window.templates || window.templateDefinitions || {};
+    console.log("📚 Available template sources:", {
+        "window.templates": !!window.templates,
+        "window.templateDefinitions": !!window.templateDefinitions,
+        "using": allTemplates === window.templates ? "window.templates" : "window.templateDefinitions"
+    });
+    
+    // Check if template exists
+    if (!allTemplates[key]) {
+        console.error("❌ Template not found:", key);
+        console.log("📋 Available template keys:", Object.keys(allTemplates));
+        console.log("💡 Did you mean one of these?", Object.keys(allTemplates).filter(k => 
+            k.toLowerCase().includes(key.toLowerCase()) || 
+            key.toLowerCase().includes(k.toLowerCase())
+        ));
+        return;
+    }
+    
+    // Template found - proceed with loading
+    console.log("✅ Template found:", key);
+    const template = allTemplates[key];
+    console.log("📄 Template details:", {
+        name: template.name,
+        fields: template.fields ? template.fields.length : 0,
+        type: template.type || "unknown"
+    });
+    
+    // Set global state
+    window.currentTemplateKey = key;
+    window.currentTemplate = template;
+    
+    // Reset all in-memory state
+    window.formData = {};
+    window.uploadedImages = {};
+    console.log("🔄 State reset: formData and uploadedImages cleared");
+    
+    // Regenerate form + preview
+    if (typeof window.generateForm === "function") {
+        console.log("📝 Calling generateForm()...");
+        window.generateForm();
+    } else {
+        console.warn("⚠️ generateForm function not found");
+    }
+    
+    if (typeof window.updatePreview === "function") {
+        console.log("🖼️ Calling updatePreview()...");
+        window.updatePreview();
+    } else {
+        console.warn("⚠️ updatePreview function not found");
+    }
+    
+    console.log("✅ loadTemplateByKey completed successfully");
+};
+```
+
+RATIONALE:
+- Added comprehensive logging at every step for debugging
+- Normalizes template key with .trim() to handle whitespace
+- Checks both window.templates and window.templateDefinitions as fallback
+- Provides detailed error messages with available keys when template not found
+- Suggests similar template keys when exact match fails
+- Logs template details when found
+- Checks for existence of required functions before calling them
+- Maintains all original functionality while adding robust error handling
+
+EXPECTED RESULTS:
+=================
+1. Syntax error "Unexpected token 'else'" should be eliminated
+2. Templates should load correctly when clicked in the template menu
+3. Console should show detailed diagnostic logs during template loading
+4. If a template is not found, console will show:
+   - Which template was requested
+   - List of all available templates
+   - Suggestions for similar template names
+5. Form generation and preview updates should work as expected
+
+TESTING STEPS:
+==============
+1. Reload index.html in Chrome
+2. Open Developer Console
+3. Click Templates → Education Drip – HP
+4. Verify:
+   - No syntax errors in console
+   - Left form populates with template fields
+   - Right preview shows rendered template
+   - Console shows detailed load sequence with ✅ success indicators
+5. If template doesn't load, console will show which step failed and why

@@ -1,0 +1,252 @@
+==============================================
+ADMIN PANEL FEATURE - CHANGE SUMMARY
+==============================================
+Date: 2025-01-23
+Implementation: Claude (MCP)
+Task Source: GPT-5.1
+
+==============================================
+TASK 1: ADMIN HOTSPOT
+==============================================
+
+FILE: index.html
+LOCATION: Inside .masthead-subnav divs
+
+ADDED (Templates subnav):
+```html
+<!-- Admin Access Hotspot (hidden) -->
+<div id="admin-access-hotspot" aria-hidden="true"></div>
+```
+
+ADDED (My Designs subnav):
+```html
+<!-- Admin Access Hotspot (hidden) -->
+<div id="admin-access-hotspot-mydesigns" class="admin-access-hotspot" aria-hidden="true"></div>
+```
+
+ADDED (Script tag):
+```html
+<script src="js/app-admin.js"></script>
+```
+
+---
+
+FILE: css/masthead.css
+LOCATION: After existing .masthead-subnav styles
+
+ADDED:
+```css
+/* ADMIN ACCESS HOTSPOT (Hidden) */
+.admin-access-hotspot,
+#admin-access-hotspot,
+#admin-access-hotspot-mydesigns {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 12px;
+    width: 120px;
+    height: 48px;
+    cursor: pointer;
+    background: transparent;
+    z-index: 10;
+}
+```
+
+==============================================
+TASK 2: ADMIN PANEL MODAL
+==============================================
+
+FILE: index.html
+LOCATION: After <!-- Trash Modal -->
+
+ADDED:
+```html
+<!-- Admin Panel Modal -->
+<div id="admin-panel" class="admin-panel hidden">
+    <div class="admin-panel__backdrop"></div>
+    <div class="admin-panel__content">
+        <header class="admin-panel__header">
+            <h2>Admin – Export History</h2>
+            <button id="admin-panel-close" aria-label="Close">×</button>
+        </header>
+        <div class="admin-panel__body">
+            <!-- Content populated by JavaScript -->
+        </div>
+    </div>
+</div>
+```
+
+---
+
+FILE: css/masthead.css
+LOCATION: After admin hotspot styles
+
+ADDED:
+```css
+/* ADMIN PANEL MODAL */
+.admin-panel.hidden { display: none; }
+.admin-panel { position: fixed; inset: 0; z-index: 9999; }
+.admin-panel__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
+.admin-panel__content { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 960px; max-width: 95vw; max-height: 80vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+.admin-panel__header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E1F0; background: #F8F7FB; }
+.admin-panel__body { padding: 24px; overflow: auto; flex: 1; }
+.admin-table { width: 100%; border-collapse: collapse; font-family: var(--font-primary); font-size: 14px; }
+/* ...additional table styles... */
+```
+
+---
+
+FILE: js/app-admin.js (NEW FILE)
+LOCATION: /Users/marksexton/Desktop/Email-Briefing-App/js/app-admin.js
+
+CREATED:
+```javascript
+// Admin Panel Module for Email Briefing App
+function openAdminPanel() { ... }
+function closeAdminPanel() { ... }
+async function loadExportHistory() { ... }
+function renderExportHistoryTable(logs) { ... }
+function openDesignFromAdmin(designId) { ... }
+// Event listeners for hotspots, close button, backdrop, action buttons
+```
+
+==============================================
+TASK 3: FIREBASE INTEGRATION
+==============================================
+
+FILE: js/app-firebase.js
+LOCATION: After deleteExport() function
+
+ADDED:
+```javascript
+/**
+ * Get export logs filtered by date range
+ * @param {Object} options - Query options
+ * @param {Date|string} options.startDate - Start date (inclusive)
+ * @param {Date|string} options.endDate - End date (inclusive)
+ * @returns {Promise<Array>} Array of export log entries
+ */
+async getExportLogs({ startDate, endDate }) {
+    await this.waitForFirebase();
+    try {
+        // Convert dates to timestamps
+        let startTimestamp = /* Date conversion logic */
+        let endTimestamp = /* Date conversion logic */
+        
+        // Query Firestore for exports in date range
+        const snapshot = await db.collection('exports')
+            .where('createdAt', '>=', startTimestamp)
+            .where('createdAt', '<=', endTimestamp)
+            .orderBy('createdAt', 'desc')
+            .get();
+        
+        const logs = [];
+        snapshot.forEach(doc => {
+            logs.push({ id: doc.id, ...doc.data() });
+        });
+        
+        return logs;
+    } catch (error) {
+        console.error('✗ Failed to get export logs:', error);
+        return [];
+    }
+}
+```
+
+==============================================
+KEY FUNCTIONS
+==============================================
+
+openAdminPanel()
+- Removes .hidden class from #admin-panel
+- Calls loadExportHistory()
+
+loadExportHistory()
+- Fetches last 7 days of exports
+- Calls EmailBriefingDB.getExportLogs()
+- Renders table with renderExportHistoryTable()
+
+renderExportHistoryTable(logs)
+- Maps export logs to HTML table rows
+- Formats dates, sizes, folder paths
+- Adds "Open design" button per row
+- Returns complete table HTML
+
+openDesignFromAdmin(designId)
+- Closes admin panel
+- Navigates to My Designs screen
+- TODO: Load design by ID into builder
+
+EmailBriefingDB.getExportLogs({ startDate, endDate })
+- Queries Firestore exports collection
+- Filters by createdAt timestamp range
+- Returns sorted array of export metadata
+
+==============================================
+USER FLOW
+==============================================
+
+1. User navigates to Templates or My Designs page
+2. Subnav ribbon appears with hidden hotspot
+3. User clicks center of ribbon (120×48px area)
+4. Admin panel modal opens over main content
+5. "Loading..." message displays
+6. Firebase query fetches last 7 days of exports
+7. Table populates with export history:
+   - Timestamp
+   - User name
+   - Design name
+   - Template type
+   - Folder path
+   - File size
+   - Open design button
+8. User can:
+   - Review export history
+   - Click "Open design" (placeholder alert)
+   - Close panel via × button or backdrop click
+
+==============================================
+TESTING CHECKLIST
+==============================================
+
+✓ Admin hotspot is invisible but clickable
+✓ Hotspot opens admin panel on both pages
+✓ Panel displays loading state initially
+✓ Firebase query executes successfully
+✓ Table renders with formatted data
+✓ Close button dismisses panel
+✓ Backdrop click dismisses panel
+✓ "Open design" buttons trigger alert
+✓ Console logs show query details
+✓ No JavaScript errors in console
+
+==============================================
+NEXT STEPS (NOT IMPLEMENTED)
+==============================================
+
+1. Connect openDesignFromAdmin() to loadDesign()
+2. Update exportAsExcel() to call saveExportMetadata()
+3. Add folder path resolution in export metadata
+4. Implement date range picker in admin UI
+5. Add user authentication checks
+6. Enable pagination for large result sets
+7. Add search/filter functionality
+8. Implement "Download again" feature
+
+==============================================
+FILES CHANGED
+==============================================
+
+MODIFIED:
+✓ index.html (+30 lines)
+✓ css/masthead.css (+120 lines)
+✓ js/app-firebase.js (+45 lines)
+
+CREATED:
+✓ js/app-admin.js (175 lines)
+
+TOTAL: 370 lines added, 3 files modified, 1 file created
+
+==============================================
+END OF DIFF SUMMARY
+==============================================

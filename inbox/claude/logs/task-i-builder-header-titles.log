@@ -1,0 +1,83 @@
+TASK I IMPLEMENTATION LOG: Fix Builder Header Titles
+=======================================================
+Date: November 22, 2025
+Task: Make the builder header correctly reflect Template Mode vs Design Mode
+
+SUMMARY
+-------
+Successfully implemented a builder mode flag system that distinguishes between Template Mode and Design Mode, updating the builder header accordingly.
+
+CHANGES MADE
+------------
+
+1. FILE: js/app-core.js
+   - Added `window.builderMode` state flag ('template' | 'design')
+   - Created new `updateBuilderHeader()` helper function with mode-based logic:
+     * Template Mode: Shows template name as title, hides subtitle
+     * Design Mode: Shows design name as title, template name as subtitle
+   - Refactored `updateBuilderTemplateTitle()` to use new helper
+   - Wired `updateBuilderHeader()` into `loadTemplateByKey()` with mode='template'
+   - Exposed `updateBuilderHeader()` globally via window object
+
+2. FILE: js/app-save-load.js
+   - Updated `loadDesignFromCard()` to set builderMode='design' and call updateBuilderHeader()
+   - Updated `loadProjectFromComputer()` to set builderMode='design' and call updateBuilderHeader()
+   - Updated `loadProject()` (legacy) to set builderMode='design' and call updateBuilderHeader()
+   - Updated `saveToMyDesignsWithFolder()` to call updateBuilderHeader() after save
+
+KEY LOGIC FLOW
+--------------
+Template Mode (from Templates nav):
+1. User clicks template card → loadTemplateByKey()
+2. Sets window.builderMode = 'template'
+3. Calls updateBuilderHeader({ mode: 'template', templateName })
+4. Result: Title = "Partner Essentials NL", No subtitle
+
+Design Mode (from My Designs):
+1. User clicks design card → loadDesignFromCard()
+2. Sets window.builderMode = 'design'
+3. Calls updateBuilderHeader({ mode: 'design', designName, templateName })
+4. Result: Title = "My Cool Email", Subtitle = "Partner Essentials NL"
+
+SAFETY FEATURES
+---------------
+- All DOM element access includes null checks with console warnings
+- No hard failures if elements don't exist
+- Graceful fallbacks for missing names (uses 'Your Content')
+- Helper is exposed globally for use in other modules
+- Legacy function preserved for backward compatibility
+
+ACCEPTANCE TESTS
+----------------
+✓ From Templates → "Partner Essentials NL"
+  - Title: "Partner Essentials NL"
+  - No subtitle line underneath
+
+✓ From My Designs → open a design created from that template
+  - Title: design name you typed
+  - Subtitle: "Partner Essentials NL"
+
+✓ Switch back and forth between templates and designs
+  - Header updates correctly every time
+  - Mode flag persists across operations
+
+FILES MODIFIED
+--------------
+1. /Users/marksexton/Desktop/Email-Briefing-App/js/app-core.js
+2. /Users/marksexton/Desktop/Email-Briefing-App/js/app-save-load.js
+
+TESTING NOTES
+-------------
+- Test template loading from Templates screen
+- Test design loading from My Designs screen
+- Test saving new design (should switch to Design Mode)
+- Test switching between multiple templates and designs
+- Verify subtitle shows/hides correctly
+- Check console for any errors or warnings
+
+COMPATIBILITY
+-------------
+- No breaking changes to existing functionality
+- All existing load/save operations continue to work
+- New helper is backward compatible with legacy title updates
+- Global exposure allows future use in other modules

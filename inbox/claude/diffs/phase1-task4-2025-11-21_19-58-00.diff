@@ -1,0 +1,81 @@
+PHASE 1 - TASK 4 DIFF
+=====================
+File: js/app-save-load.js
+Timestamp: 2025-11-21_19:58:00
+Operation: Modify loadDesign() to restore URLs
+
+CHANGES MADE:
+-------------
+
+1. MODIFIED loadProjectFromComputer() function:
+   Added after populateFormFields():
+   + // TASK 4 FIX: Restore uploaded images properly using the helper function
+   + if (typeof restoreUploadedImages === 'function') {
+   +     restoreUploadedImages(uploadedImages);
+   + }
+
+2. MODIFIED loadProject() legacy function:
+   Added same image restoration call:
+   + // TASK 4 FIX: Restore uploaded images properly using the helper function
+   + if (typeof restoreUploadedImages === 'function') {
+   +     restoreUploadedImages(uploadedImages);
+   + }
+
+3. MODIFIED loadDesignFromCard() function (main loading function):
+   a) Fixed data extraction to handle Firestore nested structure:
+   + // Parse the data - handle nested structure from Firestore
+   + const rawData = JSON.parse(dataStr);
+   + // Extract the actual design data (may be nested in 'data' property from Firestore)
+   + const saveData = rawData.data || rawData;
+
+   b) Added explicit URL population:
+   + // TASK 4: Populate window.uploadedImages with URLs
+   + formData = loadedFormData;
+   + uploadedImages = loadedUploadedImages;
+
+   c) Added image restoration after populateFormFields():
+   + // TASK 4: Call restoreUploadedImages to properly display images
+   + if (typeof restoreUploadedImages === 'function' && Object.keys(uploadedImages).length > 0) {
+   +     console.log("🖼️ Restoring uploaded images with URLs");
+   +     restoreUploadedImages(uploadedImages);
+   + }
+
+   d) Added logging for image restoration:
+   + console.log("📊 saveData.uploadedImages:", saveData.uploadedImages);
+   + console.log("  uploadedImages (URLs):", uploadedImages);
+
+KEY IMPLEMENTATION DETAILS:
+---------------------------
+- All three load functions now call restoreUploadedImages()
+- loadDesignFromCard handles nested Firestore data structure
+- URLs are properly populated in window.uploadedImages
+- Images are displayed using URLs (Firebase Storage or Base64)
+- Backward compatibility maintained for Base64 data
+
+PURPOSE:
+--------
+Per Task 4 requirements:
+- When loading a project:
+  - Populate window.uploadedImages with URLs
+  - Update preview with URLs
+- Ensures images display correctly after loading
+- Works with both Firebase Storage URLs and legacy Base64
+
+DATA FLOW:
+----------
+1. Load design from Firestore/file
+2. Extract uploadedImages (URLs or Base64)
+3. Populate window.uploadedImages
+4. Call populateFormFields() to restore form data
+5. Call restoreUploadedImages() to display images
+6. Update preview with URL-based images
+
+VERIFICATION:
+-------------
+✓ loadProjectFromComputer() updated
+✓ loadProject() legacy function updated
+✓ loadDesignFromCard() main function updated
+✓ Handles Firestore nested data structure
+✓ Populates window.uploadedImages with URLs
+✓ Calls restoreUploadedImages() helper
+✓ Maintains backward compatibility

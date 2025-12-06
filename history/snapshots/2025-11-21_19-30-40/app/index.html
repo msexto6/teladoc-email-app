@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teladoc Email Content App</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📧</text></svg>">
+    
+    <!-- Modular Stylesheets (v2.0 - 10-file architecture) -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/masthead.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/builder.css">
+    <link rel="stylesheet" href="css/preview.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/folders-trash.css">
+</head>
+<body>
+    <!-- New Masthead -->
+    <header class="masthead">
+        <div class="masthead-content">
+            <div id="masthead-home-link" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <img src="assets/images/teladoc-logo.png" alt="Teladoc Health" class="masthead-logo">
+                <h1 class="masthead-title">Email Content App<sup class="alpha-badge">ALPHA</sup></h1>
+            </div>
+            
+            <!-- Hamburger Menu (mobile only) -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <nav class="nav-menu" id="nav-menu">
+                <div class="nav-item active" data-screen="landing">Home</div>
+                <div class="nav-item nav-item-with-dropdown" data-screen="template-selection">
+                    Templates
+                    <!-- Templates Dropdown -->
+                    <div class="templates-dropdown">
+                        <div class="templates-dropdown-item" data-template="standard-template">Standard Template</div>
+                        <div class="templates-dropdown-item" data-template="education-drip-hp">Education Drip - HP</div>
+                        <div class="templates-dropdown-item" data-template="partner-essentials-nl">Partner Essentials NL</div>
+                        <div class="templates-dropdown-item" data-template="consultant-connect-nl">Consultant Connect NL</div>
+                        <div class="templates-dropdown-item" data-template="client-connections-nl">Client Connections NL</div>
+                    </div>
+                </div>
+                <div class="nav-item" data-screen="my-designs">My Designs</div>
+            </nav>
+        </div>
+        
+        <!-- Sub-Navigation (Templates page) -->
+        <div class="masthead-subnav" id="masthead-subnav-templates" style="display: none;">
+            <div class="masthead-subnav-content">
+                <h2 class="masthead-subnav-title">Templates</h2>
+                <div class="masthead-subnav-controls">
+                    <button id="new-folder-btn-templates" class="new-folder-btn">+ New Folder</button>
+                    <div id="trash-bin-templates" class="trash-bin">
+                        <img src="assets/images/trashcan.png" alt="Trash">
+                        <span class="trash-count" style="display:none;">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sub-Navigation (My Designs page) -->
+        <div class="masthead-subnav" id="masthead-subnav-mydesigns" style="display: none;">
+            <div class="masthead-subnav-content">
+                <h2 class="masthead-subnav-title">My Designs</h2>
+                <div class="masthead-subnav-controls">
+                    <button id="new-folder-btn" class="new-folder-btn">+ New Folder</button>
+                    <div id="trash-bin" class="trash-bin">
+                        <img src="assets/images/trashcan.png" alt="Trash">
+                        <span class="trash-count" style="display:none;">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SCREEN 1: Landing/Home Screen -->
+    <div id="landing-screen" class="screen active">
+        <div class="landing-container">
+            <h1 class="landing-headline">What would you like to do?</h1>
+            <div class="landing-buttons">
+                <button id="templates-btn" class="landing-btn">
+                    <span class="landing-btn-text">Templates</span>
+                </button>
+                <button id="my-designs-btn" class="landing-btn">
+                    <span class="landing-btn-text">My Designs</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2a: My Designs Screen -->
+    <div id="my-designs-screen" class="screen">
+        <div class="screen-container">
+            <div id="saved-designs-grid" class="card-grid">
+                <p class="empty-state">No saved designs yet. Create your first email!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2b: Template Selection Screen -->
+    <div id="template-selection-screen" class="screen">
+        <div class="screen-container">
+            <div id="template-cards-grid" class="card-grid">
+                <!-- Templates will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: Builder Screen (existing) -->
+    <div id="builder-screen" class="screen">
+        <div class="screen-container">
+            <div class="screen-header">
+                <button class="back-btn" onclick="goBackFromBuilder()">
+                    <img src="assets/images/back-arrow.png" alt="Back">
+                </button>
+                <div class="builder-title-container">
+                    <h2 id="builder-template-title"></h2>
+                    <div id="project-info-display" class="project-info-display" style="display:none;">
+                        <span class="project-label">Project:</span>
+                        <span id="project-name-display" class="project-name"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="main-content">
+                
+                <!-- Form Panel -->
+                <div class="panel form-panel">
+                    <select id="template-selector" style="display:none"></select>
+                    <div class="panel-header">
+                        <h2>Your Content</h2>
+                    </div>
+                    
+                    <!-- Creative Direction Section -->
+                    <div id="creative-direction-section" class="creative-section">
+                        <div class="form-field">
+                            <label>I need the creative team to...</label>
+                            <select id="creative-direction-top" class="form-input dropdown">
+                                <option>[Choose one]</option>
+                                <option>Proofread + check for brand alignment only</option>
+                                <option>Tweak the copy, but don't stray from the base messaging</option>
+                                <option>Completely re-write the copy with this draft as messaging guidance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Form Container -->
+                    <form id="email-form" class="email-form"></form>
+
+                    <!-- Hidden File Input -->
+                    <input type="file" id="load-file-input" accept=".json" style="display:none">
+                    
+                    <!-- Action Buttons -->
+                    <div id="action-buttons" class="action-buttons">
+                        <button type="button" id="save-btn" class="btn btn-primary">Save</button>
+                        <button type="button" id="save-as-btn" class="btn btn-secondary">Save As</button>
+                        <button type="button" id="copy-link-btn" class="btn btn-secondary">Copy Link</button>
+                        <button type="button" id="export-btn" class="btn btn-secondary">Export</button>
+                    </div>
+                </div>
+
+                <!-- Preview Panel -->
+                <div class="panel preview-panel">
+                    <div class="panel-header">
+                        <h2>Live Preview</h2>
+                        <div class="preview-controls">
+                            <button id="desktop-view" class="view-toggle active">Desktop</button>
+                            <button id="mobile-view" class="view-toggle">Mobile</button>
+                        </div>
+                    </div>
+
+                    <div id="preview-container" class="preview-container">
+                        <div class="preview-email">
+                            <div id="preview-content" class="email-preview-content">
+                                <p style="text-align:center;padding:80px 20px;color:#9B8FC7;">Select a template to see preview</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Modal (WITH FOLDER SELECTION) -->
+    <div id="save-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-header">Save Project</h3>
+            <input type="text" id="project-name-input" class="modal-input" placeholder="Enter project name...">
+            
+            <!-- Folder Selection -->
+            <div class="folder-selection">
+                <label>Save to folder:</label>
+                <div id="folder-hierarchy" class="folder-hierarchy">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="export-options">
+                <button class="export-option-btn" onclick="saveToMyDesigns()">Save to My Designs</button>
+                <button class="btn btn-ghost" onclick="closeSaveModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save As Modal (WITH FOLDER SELECTION) -->
+    <div id="save-as-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-header">Save As New Project</h3>
+            <input type="text" id="save-as-project-name-input" class="modal-input" placeholder="Enter new project name...">
+            
+            <!-- Folder Selection -->
+            <div class="folder-selection">
+                <label>Save to folder:</label>
+                <div id="folder-hierarchy-saveas" class="folder-hierarchy">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="export-options">
+                <button class="export-option-btn" onclick="confirmSaveAs()">Save As</button>
+                <button class="btn btn-ghost" onclick="closeSaveAsModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal (WITH FOLDER SELECTION) -->
+    <div id="export-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-header">Export Options</h3>
+            
+            <!-- Folder Selection -->
+            <div class="folder-selection">
+                <label>Save to folder:</label>
+                <div id="folder-hierarchy-export" class="folder-hierarchy">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="export-options">
+                <button class="export-option-btn" onclick="exportAsExcel()">Export Package</button>
+                <button class="btn btn-ghost" onclick="closeExportModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Folder Color Modal -->
+    <div id="folder-color-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-header">Create New Folder</h3>
+            <input type="text" id="folder-name-input" class="modal-input" placeholder="Enter folder name...">
+            
+            <div class="folder-color-selection">
+                <label>Choose folder color:</label>
+                <div class="color-options">
+                    <div class="color-option selected" data-color="purple" onclick="selectFolderColor('purple')">
+                        <img src="assets/images/folder-purple.png" alt="Purple">
+                    </div>
+                    <div class="color-option" data-color="aqua" onclick="selectFolderColor('aqua')">
+                        <img src="assets/images/folder-aqua.png" alt="Aqua">
+                    </div>
+                    <div class="color-option" data-color="green" onclick="selectFolderColor('green')">
+                        <img src="assets/images/folder-green.png" alt="Green">
+                    </div>
+                    <div class="color-option" data-color="plum" onclick="selectFolderColor('plum')">
+                        <img src="assets/images/folder-plum.png" alt="Plum">
+                    </div>
+                    <div class="color-option" data-color="berry" onclick="selectFolderColor('berry')">
+                        <img src="assets/images/folder-berry.png" alt="Berry">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="export-options">
+                <button class="export-option-btn" onclick="saveFolderFromModal()">Create Folder</button>
+                <button class="btn btn-ghost" onclick="closeFolderColorModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trash Modal -->
+    <div id="trash-modal" class="trash-modal">
+        <div class="trash-modal-content">
+            <div class="trash-modal-header">
+                <h3>Trash</h3>
+                <button class="trash-close-btn" onclick="closeTrashModal()">×</button>
+            </div>
+            <div id="trash-items-grid" class="trash-items-grid">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JSZip Library for Export Functionality -->
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <!-- html2canvas and jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Modular JavaScript Architecture -->
+    <script src="js/custom-dialogs.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/app-firebase.js"></script>
+    <script src="js/app-core.js"></script>
+    <script src="js/app-ui.js"></script>
+    <script src="js/app-form.js"></script>
+    <script src="js/app-preview.js"></script>
+    <script src="js/app-images.js"></script>
+    <script src="js/app-rich-text.js"></script>
+    <script src="js/app-folder-hierarchy.js"></script>
+    <script src="js/app-export.js"></script>
+    <script src="js/app-save-load.js"></script>
+    <script src="js/app-share-link.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/folders-trash.js"></script>
+    <script src="js/dropdown-animation.js"></script>
+
+    
+    <!-- Template Preview Renderers (standard-template removed - uses base renderer) -->
+    <script src="js/templates/education-drip-hp.js"></script>
+    <script src="js/templates/partner-essentials-nl.js"></script>
+    <script src="js/templates/consultant-connect-nl.js"></script>
+    <script src="js/templates/client-connections-nl.js"></script>
+</body>
+</html>

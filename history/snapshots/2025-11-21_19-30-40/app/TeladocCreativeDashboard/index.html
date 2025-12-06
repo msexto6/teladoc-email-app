@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teladoc Creative Dashboard</title>
+    <style>
+        /* Font Face Declarations for Teladoc Fonts */
+        @font-face {
+            font-family: 'Dalton Maag Effra';
+            src: url('fonts/Dalton Maag - Effra Light.woff') format('woff'),
+                 url('fonts/Dalton Maag - Effra Light.ttf') format('truetype');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: 'Dalton Maag Effra';
+            src: url('fonts/Dalton Maag - Effra.woff') format('woff'),
+                 url('fonts/Dalton Maag - Effra.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: 'Dalton Maag Effra';
+            src: url('fonts/Dalton Maag - Effra Medium.woff') format('woff'),
+                 url('fonts/Dalton Maag - Effra Medium.ttf') format('truetype');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: 'Dalton Maag Effra';
+            src: url('fonts/Dalton Maag - Effra Bold.woff') format('woff'),
+                 url('fonts/Dalton Maag - Effra Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: 'Reckless Neue';
+            src: url('fonts/RecklessNeue-Bold.woff') format('woff'),
+                 url('fonts/RecklessNeue-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Dalton Maag Effra', Arial, sans-serif;
+            background: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: #FFFFFF;
+            padding: 50px 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .logo img {
+            height: 100%;
+            width: auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: #351F65;
+            padding: 80px 40px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .hero-content {
+            width: 60%; /* Reduced from 65% to give more space */
+            padding-right: 60px; /* More padding to keep text away from image */
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-image {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 35%;
+            overflow: hidden;
+        }
+
+        .hero-image img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .hero-content {
+                width: 100%;
+                padding-right: 0;
+                text-align: center;
+            }
+            
+            .hero-image {
+                display: none;
+            }
+        }
+
+
+
+        .hero h1 {
+            font-family: 'Reckless Neue', Georgia, serif;
+            color: #FFFFFF;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .subtitle {
+            font-family: 'Dalton Maag Effra', Arial, sans-serif;
+            color: #00B5E2;
+            font-size: 18px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 40px;
+            flex: 1;
+        }
+
+        .section-title {
+            font-family: 'Reckless Neue', Georgia, serif;
+            color: #351F65;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+
+        /* Button Grid */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .work-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            background: #FFFFFF;
+            color: #6240E8;
+            text-decoration: none;
+            border-radius: 50px;
+            font-family: 'Dalton Maag Effra', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid #6240E8;
+            position: relative;
+            text-align: center;
+        }
+
+        .work-button:hover {
+            background: #6240E8;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+        }
+
+
+
+        /* Open All Button */
+        .open-all {
+            width: 100%;
+            max-width: 400px;
+            margin: 40px auto;
+            display: block;
+            padding: 18px 32px;
+            background: #6240E8;
+            color: #FFFFFF;
+            font-family: 'Dalton Maag Effra', Arial, sans-serif;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .open-all:hover {
+            background: #351F65;
+            transform: scale(1.05);
+        }
+
+        /* Team Section Styles */
+        .team-container {
+            background: linear-gradient(135deg, #351F65 0%, #2D1B4E 100%);
+            padding: 80px 0;
+            margin-top: 60px;
+        }
+
+        .team-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .team-title {
+            font-family: 'Reckless Neue', Georgia, serif;
+            color: #FFFFFF;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .director-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+        }
+
+        .director-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            overflow: hidden;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .director-photo:hover {
+            transform: scale(1.05);
+        }
+
+        .director-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .director-info h3 {
+            font-family: 'Reckless Neue', Georgia, serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 5px;
+        }
+
+        .director-info p {
+            font-size: 18px;
+            color: #00B5E2;
+        }
+
+        .team-section {
+            margin-bottom: 50px;
+        }
+
+        .team-section-header {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #00B5E2;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+            justify-items: center;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .team-member {
+            text-align: center;
+            text-decoration: none;
+            color: #FFFFFF;
+            transition: transform 0.3s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+        }
+
+        .member-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .member-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .team-member:hover .member-photo {
+            transform: scale(1.1);
+        }
+
+        .member-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #FFFFFF;
+        }
+
+        .member-title {
+            font-size: 14px;
+            color: #00B5E2;
+        }
+
+        /* Department color coding */
+        .design .team-section-header { color: #CA01BE; }
+        .copy .team-section-header { color: #6240E8; }
+        .multimedia .team-section-header { color: #00B5E2; }
+        .ops .team-section-header { color: #00E5A0; }
+
+        /* Footer */
+        .footer {
+            background: #F8F8F8;
+            padding: 40px;
+            text-align: center;
+            color: #666;
+            font-family: 'Dalton Maag Effra', Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .footer-logo {
+            height: 30px;
+            margin-bottom: 16px;
+        }
+
+        .footer-logo img {
+            height: 100%;
+            width: auto;
+        }
+
+        /* Teladoc Logo */
+        .teladoc-logo {
+            max-width: 200px;
+        }
+
+
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .container {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="teladoc-logo.png" alt="Teladoc Health" class="teladoc-logo">
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Creative Team Dashboard</h1>
+            <p class="subtitle">Quick access to all your work tools</p>
+        </div>
+        <div class="hero-image">
+            <img src="images/runnning-man.jpg" alt="Runner">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2 class="section-title">Work Applications</h2>
+        
+        <div class="button-grid">
+            <a href="https://experience.adobe.com/#/@teladochealth1/so:teladochealth-Production/workfront/home/workspaces" target="_blank" class="work-button adobe">
+                <span>Adobe Workfront</span>
+            </a>
+            
+            <a href="https://teladocpa.sharepoint.com/sites/Creative723/Shared%20Documents/Forms/AllItems.aspx?ovuser=c162a585%2D4fef%2D44bd%2D9271%2Dd96409d0a349%2Cmark%2Esexton%40teladochealth%2Ecom&OR=Teams%2DHL&CT=1757963577983&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI1MC8yNTA4MTUwMDcxNyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D" target="_blank" class="work-button sharepoint-creative">
+                <span>Creative SharePoint</span>
+            </a>
+            
+            <a href="https://teladocpa.sharepoint.com/sites/Brand?xsdata=MDV8MDJ8fDMyZWIwNWQ0N2M1NjRlNGYwYjE3MDhkZGY0OWQwMzc4fGMxNjJhNTg1NGZlZjQ0YmQ5MjcxZDk2NDA5ZDBhMzQ5fDB8MHw2Mzg5MzU2NzczNjE3MjAwODd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKRFFTSTZJbFJsWVcxelgwRlVVRk5sY25acFkyVmZVMUJQVEU5R0lpd2lWaUk2SWpBdU1DNHdNREF3SWl3aVVDSTZJbGRwYmpNeUlpd2lRVTRpT2lKUGRHaGxjaUlzSWxkVUlqb3hNWDA9fDF8TDJOb1lYUnpMekU1T2pBMFpEVmtaV1UwTFdZMU1USXROR1F4WkMxaE9UZG1MV0l6WXpSaE5tSXlZakU0TUY4NE56RTVaVE00TkMwMU1tTXlMVFF3WWprdE9UVmxNQzFtWWpZek1Ua3hPVGRrWkRSQWRXNXhMbWRpYkM1emNHRmpaWE12YldWemMyRm5aWE12TVRjMU56azNNRGt6TlRZM01BPT18YTc0N2Y0ZTA4NDk4NDg4NjQ4MWMwOGRkZjQ5ZDAzNzd8MzM2MzQxNWQ0OWVmNDE4NzkzYjA2Y2YxZWMzOTkwOWQ%3D&sdata=NG5kWjlLK2hyV2FEZnpwejNRVXVqVTNQdkt3citwcEpuclpFN0dsS2d0ND0%3D&ovuser=c162a585-4fef-44bd-9271-d96409d0a349%2Cmark.sexton%40teladochealth.com&OR=Teams-HL&CT=1757970943906&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI1MC8yNTA4MTUwMDcxNyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D" target="_blank" class="work-button brand">
+                <span>Brand SharePoint</span>
+            </a>
+            
+            <a href="https://teladochealth.highspot.com/" target="_blank" class="work-button highspot">
+                <span>Highspot</span>
+            </a>
+            
+            <a href="https://www.figma.com/files/888890531932409996?fuid=1549497506398556522" target="_blank" class="work-button figma">
+                <span>Figma Files</span>
+            </a>
+            
+            <a href="https://teladocpa.sharepoint.com/SitePages/Home.aspx" target="_blank" class="work-button sharepoint-home">
+                <span>Teladoc SharePoint</span>
+            </a>
+            
+            <a href="https://teladocpa-my.sharepoint.com/:w:/g/personal/kim_dixson_teladochealth_com/ERpCJvZC489PshdRhp6sNI0BNflaQBBldYnPLJvqLL0-BA?email=mark.sexton%40teladochealth.com&wdOrigin=TEAMS-MAGLEV.p2p_ns.rwc&wdExp=TEAMS-TREATMENT&wdhostclicktime=1758575421327&web=1" target="_blank" class="work-button onboarding">
+                <span>My Onboarding 30/60/90 Goals</span>
+            </a>
+            
+            <a href="https://www.compliancewire.com/CW3/Standard/ToDo" target="_blank" class="work-button compliance">
+                <span>Compliance Wire Training</span>
+            </a>
+        </div>
+        
+        <button class="open-all" onclick="openAllTabs()">
+            Open all applications
+        </button>
+    </div>
+
+    <!-- Team Section -->
+    <div class="team-container">
+        <div class="team-inner">
+            <h2 class="team-title">Our team</h2>
+            
+            <!-- Director -->
+            <div class="director-section">
+                <a href="https://teams.microsoft.com/l/chat/0/0?users=kim.dixson@teladochealth.com" class="director-photo">
+                    <img src="images/team/kim.jpg" alt="Kim Dixson">
+                </a>
+                <div class="director-info">
+                    <h3>Kim Dixson</h3>
+                    <p>Director, Creative</p>
+                </div>
+            </div>
+
+            <!-- Design Team -->
+            <div class="team-section design">
+                <h3 class="team-section-header">DESIGN</h3>
+                <div class="team-grid">
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=jess.argarate@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/jess.jpg" alt="Jess Argarate">
+                        </div>
+                        <div class="member-name">Jess Argarate</div>
+                        <div class="member-title">Sr. Designer</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=ro.lalia@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/ro.jpg" alt="Ro Lalia">
+                        </div>
+                        <div class="member-name">Ro Lalia</div>
+                        <div class="member-title">Sr. Designer</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=ale.placenti@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/ale.jpg" alt="Ale Placenti">
+                        </div>
+                        <div class="member-name">Ale Placenti</div>
+                        <div class="member-title">Designer</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Copy Team -->
+            <div class="team-section copy">
+                <h3 class="team-section-header">COPY</h3>
+                <div class="team-grid">
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=katy.downey@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/katy.jpg" alt="Katy Downey">
+                        </div>
+                        <div class="member-name">Katy Downey</div>
+                        <div class="member-title">Sr. Copywriter</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=kate.kling@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/kate.jpg" alt="Kate Kling">
+                        </div>
+                        <div class="member-name">Kate Kling</div>
+                        <div class="member-title">Sr. Copywriter</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Multimedia Team -->
+            <div class="team-section multimedia">
+                <h3 class="team-section-header">MULTIMEDIA</h3>
+                <div class="team-grid">
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=jody.braverman@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/jody.jpg" alt="Jody Braverman">
+                        </div>
+                        <div class="member-name">Jody Braverman</div>
+                        <div class="member-title">QA</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=dave.jenkins@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/dave.jpg" alt="Dave Jenkins">
+                        </div>
+                        <div class="member-name">Dave Jenkins</div>
+                        <div class="member-title">Video</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=dan.nyguen@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/dan.jpg" alt="Dan Nyguen">
+                        </div>
+                        <div class="member-name">Dan Nyguen</div>
+                        <div class="member-title">Web</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=mark.sexton@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/mark.jpg" alt="Mark Sexton">
+                        </div>
+                        <div class="member-name">Mark Sexton</div>
+                        <div class="member-title">CD</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Operations Team -->
+            <div class="team-section ops">
+                <h3 class="team-section-header">OPS</h3>
+                <div class="team-grid">
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=bel.blanco@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/bel.jpg" alt="Bel Blanco">
+                        </div>
+                        <div class="member-name">Bel Blanco</div>
+                        <div class="member-title">Sr. PM</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=lula.chanllio@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/lula.jpg" alt="Lula Chanllio">
+                        </div>
+                        <div class="member-name">Lula Chanllio</div>
+                        <div class="member-title">PM</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=carla.dimartino@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/carla.jpg" alt="Carla Di Martino">
+                        </div>
+                        <div class="member-name">Carla Di Martino</div>
+                        <div class="member-title">Sr. PM</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=patricia.echague@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/patricia.jpg" alt="Patricia Echague">
+                        </div>
+                        <div class="member-name">Patricia Echague</div>
+                        <div class="member-title">PM</div>
+                    </a>
+                    <a href="https://teams.microsoft.com/l/chat/0/0?users=agus.sanfilippo@teladochealth.com" class="team-member">
+                        <div class="member-photo">
+                            <img src="images/team/agus.jpg" alt="Agus Sanfilippo">
+                        </div>
+                        <div class="member-name">Agus Sanfilippo</div>
+                        <div class="member-title">RM</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-logo">
+            <img src="teladoc-logo.png" alt="Teladoc Health" class="teladoc-logo">
+        </div>
+        <p>© 2025 Teladoc Health, Inc. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function openAllTabs() {
+            const links = document.querySelectorAll('.work-button');
+            links.forEach(link => {
+                window.open(link.href, '_blank');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+PHASE 1 - TASK 4 EXECUTION LOG
+==============================
+Timestamp: 2025-11-21_19:58:00
+Executor: Claude MCP
+Task: Modify loadDesign() to restore URLs
+
+EXECUTION STEPS:
+----------------
+[19:52:00] Started Task 4 of Phase 1 Storage Refactor
+[19:52:30] Read js/app-save-load.js (760 lines)
+[19:53:00] Identified three load functions needing updates
+[19:54:00] Modified loadProjectFromComputer() function
+[19:54:30] Modified loadProject() legacy function
+[19:55:00] Modified loadDesignFromCard() main function
+[19:56:00] Added Firestore nested data handling
+[19:57:00] Added restoreUploadedImages() calls
+[19:58:00] Created diff file documenting changes
+[19:58:15] Writing this execution log
+
+CHANGES SUMMARY:
+----------------
+✓ Updated all three load functions
+✓ Added calls to restoreUploadedImages() helper
+✓ Fixed Firestore nested data extraction
+✓ Ensured window.uploadedImages populated with URLs
+✓ Added comprehensive logging for debugging
+
+FILES MODIFIED:
+---------------
+js/app-save-load.js
+- Lines modified: ~25
+- Total lines: 765 (was 760)
+- Functions modified: 
+  - loadProjectFromComputer()
+  - loadProject()
+  - loadDesignFromCard()
+
+IMPLEMENTATION DETAILS:
+-----------------------
+1. loadProjectFromComputer():
+   - Added restoreUploadedImages() call after populateFormFields()
+   - Ensures images display when loading from file
+
+2. loadProject() (legacy):
+   - Added same restoreUploadedImages() call
+   - Maintains compatibility with old load method
+
+3. loadDesignFromCard() (primary):
+   - Fixed data extraction: rawData.data || rawData
+   - Handles Firestore's nested structure
+   - Populates window.uploadedImages with URLs
+   - Calls restoreUploadedImages() with safety check
+   - Added debug logging for verification
+
+DATA FLOW VERIFIED:
+-------------------
+1. Design loaded from Firestore/file
+2. Data extracted (handles nesting)
+3. uploadedImages populated with URLs
+4. Form generated and populated
+5. Images restored to display zones
+6. Preview updated with URL-based images
+
+BACKWARD COMPATIBILITY:
+-----------------------
+- Base64 images still work (displayed as-is)
+- Firebase Storage URLs work (displayed directly)
+- restoreUploadedImages() handles both types
+- No data loss or conversion required
+
+STATUS: SUCCESS
+Task 4 completed successfully.
+Ready for GPT review before proceeding to Task 5.

@@ -1,0 +1,90 @@
+SPRINT N3b HOTFIX - CODE DIFFS
+==============================
+Date: 2025-11-30
+
+FILE 1: js/app-core.js
+======================
+
+LOCATION: Inside window.loadTemplateByKey() function
+POSITION: After state reset, before TASK I builder mode section
+
+--- BEFORE ---
+    // SPRINT N3: Clear currentDesignId for fresh template (new design)
+    if (typeof window.currentDesignId !== 'undefined') {
+        window.currentDesignId = null;
+        console.log("🆔 SPRINT N3: Cleared currentDesignId (new design)");
+    }
+    
+    // TASK I: Set builder mode to 'template' and update header
+    window.builderMode = 'template';
+
+--- AFTER ---
+    // SPRINT N3: Clear currentDesignId for fresh template (new design)
+    if (typeof window.currentDesignId !== 'undefined') {
+        window.currentDesignId = null;
+        console.log("🆔 SPRINT N3: Cleared currentDesignId (new design)");
+    }
+    
+    // --- SPRINT N3b: Always initialize + apply example defaults ---
+    if (typeof window.initializeFormDataFromTemplate === "function") {
+        window.initializeFormDataFromTemplate(templateDefinition);
+    }
+
+    if (typeof window.applyExampleDefaults === "function") {
+        window.applyExampleDefaults(window.formData, templateDefinition.fields);
+    }
+    
+    // TASK I: Set builder mode to 'template' and update header
+    window.builderMode = 'template';
+
+LINES ADDED: 8
+IMPACT: All new template selections now get example defaults
+
+
+FILE 2: js/app-save-load.js
+============================
+
+LOCATION: Inside async function loadDesignById()
+POSITION: After template validation, before "Save navigation state" comment
+
+--- BEFORE ---
+        if (!templateDefinition.fields || !Array.isArray(templateDefinition.fields)) {
+            console.error('Template has no valid fields array');
+            alert('Template definition is invalid.');
+            return;
+        }
+
+        // CRITICAL: Save navigation state BEFORE loading (for My Designs back button)
+        if (typeof navigationHistory !== 'undefined' && typeof currentFolderPath !== 'undefined') {
+
+--- AFTER ---
+        if (!templateDefinition.fields || !Array.isArray(templateDefinition.fields)) {
+            console.error('Template has no valid fields array');
+            alert('Template definition is invalid.');
+            return;
+        }
+
+        // --- SPRINT N3b: Fill empty fields with example defaults (safe, empty-only) ---
+        if (typeof window.applyExampleDefaults === "function") {
+            window.applyExampleDefaults(formData, templateDefinition.fields);
+        }
+
+        // CRITICAL: Save navigation state BEFORE loading (for My Designs back button)
+        if (typeof navigationHistory !== 'undefined' && typeof currentFolderPath !== 'undefined') {
+
+LINES ADDED: 4
+IMPACT: Existing designs with empty fields now get example defaults
+
+
+SUMMARY
+=======
+Total lines modified: 12
+Files changed: 2
+Breaking changes: None
+Backwards compatible: Yes
+
+These changes ensure example defaults apply universally across:
+- All template types
+- New designs (loadTemplateByKey path)
+- Existing designs (loadDesignById path)
+- Without depending on isNewDesign() or currentDesignId checks

@@ -1,0 +1,63 @@
+EXPORT MODAL SIMPLIFICATION – COMPLETE
+======================================
+Date: 2025-11-23
+Task Source: Mark's direct instructions
+Implementer: Claude (MCP)
+
+OBJECTIVE:
+Remove folder selection UI from Export modal and implement automatic folder assignment based on the source design's location.
+
+✅ COMPLETED CHANGES:
+
+1. UI Changes (index.html)
+   - Export modal already simplified (previous work)
+   - Removed folder selection block
+   - Shows only ZIP contents description + buttons
+   - Typography follows spec:
+     * Heading: 16px, font-weight 600
+     * Body: 14px standard weight
+
+2. Backend Logic (app-firebase.js)
+   - Updated saveExportMetadata() function
+   - Auto-determines folder from source design
+   - Inheritance logic:
+     * Has designId? → Fetch design from Firestore
+     * Design has folderId? → Use that folder
+     * No folder or error? → Default to null (My Designs)
+   - Added folderId field to export metadata
+   - Enhanced logging for debugging
+
+3. Integration Points
+   - app-export.js already passes designId correctly
+   - Admin panel already queries by folderId
+   - No breaking changes to existing systems
+
+USER EXPERIENCE:
+- Marketer opens Export modal
+- Sees clean description of ZIP contents
+- Clicks "Download Export Package"
+- Behind scenes: export inherits folder from design
+- Admin can filter exports by folder in history
+
+TECHNICAL NOTES:
+- Uses async/await for Firestore query
+- Graceful error handling (defaults to root on failure)
+- Maintains backward compatibility
+- No UI changes needed beyond what was already done
+
+FILES MODIFIED:
+- js/app-firebase.js (saveExportMetadata function only)
+
+FILES REVIEWED (NO CHANGES NEEDED):
+- index.html (already correct)
+- js/app-export.js (already passing correct data)
+- js/app-admin.js (already filtering by folder)
+
+TESTING REQUIRED:
+1. Export a root-level design → verify folderId: null
+2. Export a design in folder → verify folderId matches
+3. Check Admin panel → verify folder filtering works
+4. Verify ZIP downloads correctly
+5. Check browser console for folder inheritance logs
+
+STATUS: ✅ READY FOR TESTING

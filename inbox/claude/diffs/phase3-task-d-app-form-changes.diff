@@ -1,0 +1,283 @@
+# DIFF: js/app-form.js
+# Phase 3 Task D - Add default value initialization to form fields
+
+## Function: createTextInput()
+
+### BEFORE (Lines ~295-340):
+```javascript
+function createTextInput(field) {
+    const div = document.createElement("div");
+    
+    // ... [rich text link field code - unchanged] ...
+    
+    } else {
+        // Regular text input
+        const input = document.createElement("input");
+        input.type = "text";
+        input.id = field.id;
+        input.className = "form-input";
+        input.placeholder = field.placeholder || "";
+        
+        div.appendChild(input);
+
+        // CRITICAL FIX: Always add input listener, regardless of maxChars
+        input.addEventListener("input", e => {
+            console.log(`📝 Text field "${field.id}" updated to: "${e.target.value}"`);
+            formData[field.id] = e.target.value;
+            console.log(`   Current formData keys: [${Object.keys(formData).join(', ')}]`);
+            
+            // Only update character counter if field has maxChars
+            if(field.maxChars) {
+                updateCharacterCounter(input, field.maxChars);
+            }
+            updatePreview();
+        });
+        
+        // Add character counter UI only if maxChars is specified
+        if(field.maxChars) {
+            const counter = document.createElement("div");
+            counter.className = "char-counter";
+            counter.innerHTML = `
+                <span class="char-count">0 / ${field.maxChars}</span>
+                <div class="char-progress-bar">
+                    <div class="char-progress-fill safe" style="width:0%"></div>
+                </div>
+            `;
+            div.appendChild(counter);
+        }
+    }
+    
+    return div;
+}
+```
+
+### AFTER (With Default Value Initialization):
+```javascript
+function createTextInput(field) {
+    const div = document.createElement("div");
+    
+    // ... [rich text link field code with default values - see below] ...
+    
+    } else {
+        // Regular text input
+        const input = document.createElement("input");
+        input.type = "text";
+        input.id = field.id;
+        input.className = "form-input";
+        input.placeholder = field.placeholder || "";
+        
++       // PHASE 3 TASK D: Apply default value
++       const storedValue = window.formData?.[field.id];
++       const templateDefault = field.value || field.defaultValue || field.initialValue || field.sampleText || null;
++       const initialValue = (storedValue != null && storedValue !== '') ? storedValue : (templateDefault || '');
++       
++       if (initialValue) {
++           input.value = initialValue;
++           window.formData[field.id] = initialValue;
++       }
+        
+        div.appendChild(input);
+
+        // CRITICAL FIX: Always add input listener, regardless of maxChars
+        input.addEventListener("input", e => {
+            console.log(`📝 Text field "${field.id}" updated to: "${e.target.value}"`);
+            formData[field.id] = e.target.value;
+            console.log(`   Current formData keys: [${Object.keys(formData).join(', ')}]`);
+            
+            // Only update character counter if field has maxChars
+            if(field.maxChars) {
+                updateCharacterCounter(input, field.maxChars);
+            }
+            updatePreview();
+        });
+        
+        // Add character counter UI only if maxChars is specified
+        if(field.maxChars) {
+            const counter = document.createElement("div");
+            counter.className = "char-counter";
+            counter.innerHTML = `
+                <span class="char-count">0 / ${field.maxChars}</span>
+                <div class="char-progress-bar">
+                    <div class="char-progress-fill safe" style="width:0%"></div>
+                </div>
+            `;
+            div.appendChild(counter);
++           
++           // Update counter immediately if there's initial value
++           if (initialValue) {
++               setTimeout(() => updateCharacterCounter(input, field.maxChars), 50);
++           }
+        }
+    }
+    
+    return div;
+}
+```
+
+### Rich Text Link Field (Within same function):
+```diff
+        const editor = document.createElement("div");
+        editor.id = field.id;
+        editor.className = "form-input rich-text-editor";
+        editor.contentEditable = "true";
+        editor.setAttribute("data-placeholder", field.placeholder || "");
+        editor.style.minHeight = "60px";
+        
++       // PHASE 3 TASK D: Apply default value
++       const storedValue = window.formData?.[field.id];
++       const templateDefault = field.value || field.defaultValue || field.initialValue || field.sampleText || null;
++       const initialValue = (storedValue != null && storedValue !== '') ? storedValue : (templateDefault || '');
++       
++       if (initialValue) {
++           if (typeof window.setEditorHTML === 'function') {
++               window.setEditorHTML(editor, initialValue);
++           } else {
++               editor.innerHTML = initialValue;
++           }
++           window.formData[field.id] = initialValue;
++       }
+        
+        div.appendChild(editor);
+        
+        // ... [toolbar and event listeners - unchanged] ...
+        
+        if(field.maxChars) {
+            const counter = document.createElement("div");
+            counter.className = "char-counter";
+            counter.innerHTML = `
+                <span class="char-count">0 / ${field.maxChars}</span>
+                <div class="char-progress-bar">
+                    <div class="char-progress-fill safe" style="width:0%"></div>
+                </div>
+            `;
+            div.appendChild(counter);
++           
++           // Update counter immediately if there's initial value
++           if (initialValue) {
++               setTimeout(() => updateCharacterCounterFromEditor(editor, field.maxChars), 50);
++           }
+        }
+```
+
+---
+
+## Function: createTextarea()
+
+### Rich Text Textarea (body-copy, highlight-body, etc.):
+```diff
+        // Create contenteditable div instead of textarea for rich text
+        const editor = document.createElement("div");
+        editor.id = field.id;
+        editor.className = "form-input form-textarea rich-text-editor";
+        editor.contentEditable = "true";
+        editor.setAttribute("data-placeholder", field.placeholder || "");
+        
++       // PHASE 3 TASK D: Apply default value
++       const storedValue = window.formData?.[field.id];
++       const templateDefault = field.value || field.defaultValue || field.initialValue || field.sampleText || null;
++       const initialValue = (storedValue != null && storedValue !== '') ? storedValue : (templateDefault || '');
++       
++       if (initialValue) {
++           if (typeof window.setEditorHTML === 'function') {
++               window.setEditorHTML(editor, initialValue);
++           } else {
++               editor.innerHTML = initialValue;
++           }
++           window.formData[field.id] = initialValue;
++       }
+        
+        div.appendChild(editor);
+        
+        // ... [toolbar and event listeners - unchanged] ...
+        
+        if(field.maxChars) {
+            const counter = document.createElement("div");
+            counter.className = "char-counter";
+            counter.innerHTML = `
+                <span class="char-count">0 / ${field.maxChars}</span>
+                <div class="char-progress-bar">
+                    <div class="char-progress-fill safe" style="width:0%"></div>
+                </div>
+            `;
+            div.appendChild(counter);
++           
++           // Update counter immediately if there's initial value
++           if (initialValue) {
++               setTimeout(() => updateCharacterCounterFromEditor(editor, field.maxChars), 50);
++           }
+        }
+```
+
+### Regular Textarea:
+```diff
+    } else {
+        // Regular textarea for non-body-copy fields
+        const textarea = document.createElement("textarea");
+        textarea.id = field.id;
+        textarea.className = "form-input form-textarea";
+        textarea.placeholder = field.placeholder || "";
+        
++       // PHASE 3 TASK D: Apply default value
++       const storedValue = window.formData?.[field.id];
++       const templateDefault = field.value || field.defaultValue || field.initialValue || field.sampleText || null;
++       const initialValue = (storedValue != null && storedValue !== '') ? storedValue : (templateDefault || '');
++       
++       if (initialValue) {
++           textarea.value = initialValue;
++           window.formData[field.id] = initialValue;
++       }
+        
+        div.appendChild(textarea);
+        
+        // ... [event listener - unchanged] ...
+        
+        if(field.maxChars) {
+            const counter = document.createElement("div");
+            counter.className = "char-counter";
+            counter.innerHTML = `
+                <span class="char-count">0 / ${field.maxChars}</span>
+                <div class="char-progress-bar">
+                    <div class="char-progress-fill safe" style="width:0%"></div>
+                </div>
+            `;
+            div.appendChild(counter);
++           
++           // Update counter immediately if there's initial value
++           if (initialValue) {
++               setTimeout(() => updateCharacterCounter(textarea, field.maxChars), 50);
++           }
+        }
+    }
+```
+
+---
+
+## Summary of Changes:
+
+**Lines Added:** ~60 lines (across 4 field types)  
+**Lines Removed:** 0  
+**Lines Modified:** 0
+
+**Change Pattern (repeated 4 times for different field types):**
+1. Added default value resolution logic:
+   - Checks window.formData for stored value
+   - Falls back to template field properties (value, defaultValue, initialValue, sampleText)
+   - Prefers stored value over template default
+   
+2. Applied initial value to DOM element:
+   - input.value for text inputs
+   - textarea.value for textareas
+   - setEditorHTML() or innerHTML for rich text editors
+   
+3. Initialized formData with default value:
+   - window.formData[field.id] = initialValue
+   
+4. Updated character counters:
+   - Added setTimeout(() => updateCharacterCounter(...), 50)
+   - Only when initialValue exists and field.maxChars is defined
+
+**No Breaking Changes:**
+- All existing functionality preserved
+- Saved designs load correctly (stored values take priority)
+- Fresh templates now have default content
+- Character counters work for both initial and user-edited content

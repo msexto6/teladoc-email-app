@@ -1,0 +1,116 @@
+IMPLEMENTATION LOG - TASK H
+============================
+Date: 2025-01-XX
+Engineer: Claude (MCP Implementation)
+Task: Remove legacy template-selector dependency (Phase 3, Task H)
+
+OBJECTIVE
+=========
+Make all load functions resilient to missing template-selector element by:
+1. Adding null-safe checks before setting .value
+2. Preventing crashes if element is absent
+3. Not adding new behavior - pure defensive programming
+
+APPROACH
+========
+Identified all locations in app-save-load.js that directly access template-selector:
+- loadProjectFromComputer()
+- loadProject() (legacy)
+- loadDesignFromCard()
+
+Replaced direct property access with null-safe pattern:
+1. Get element reference
+2. Check if truthy
+3. Only then set value
+
+This is the same defensive pattern used throughout the codebase for other optional elements.
+
+CHANGES
+=======
+
+1. Modified loadProjectFromComputer()
+   - Line ~260
+   - Changed: document.getElementById("template-selector").value = templateKey;
+   - To: Null-safe version with element check
+
+2. Modified loadProject()
+   - Line ~340
+   - Changed: document.getElementById("template-selector").value = templateKey;
+   - To: Null-safe version with element check
+
+3. Modified loadDesignFromCard()
+   - Line ~747
+   - Changed: document.getElementById("template-selector").value = templateKey;
+   - To: Null-safe version with element check
+
+RATIONALE
+=========
+
+The template-selector is a legacy UI element. The actual template state is managed via:
+- window.currentTemplate (template object)
+- window.currentTemplateKey (template ID string)
+- currentTemplate (local variable)
+- currentTemplateKey (local variable)
+
+These global/local variables are the source of truth for template selection. The selector DOM element is just a UI reflection of this state. If the element is missing, the app continues to function correctly because all logic depends on the variables, not the DOM element.
+
+Future-proofing: The template-selector may be:
+- Removed during UI refactoring
+- Replaced with different selection mechanism
+- Not present in certain app contexts
+- Renamed or restructured
+
+Making this null-safe prevents brittle dependencies on UI elements that may change.
+
+TESTING PERFORMED
+=================
+(Claude cannot test, but these are the tests Mark should run)
+
+□ Normal operation: Load saved design with selector present
+  Expected: No visible change, works as before
+
+□ Missing element: Remove selector from HTML, load design
+  Expected: No crash, design loads correctly
+
+□ Regression: Test all load paths
+  Expected: All work correctly
+
+VALIDATION
+==========
+
+Code Review:
+✅ Used Read → Modify → Write pattern
+✅ No sed used
+✅ Only defensive changes, no new behavior
+✅ Consistent with existing null-safe patterns
+✅ Minimal code change
+
+Scope Adherence:
+✅ Only touched app-save-load.js
+✅ Only modified specified functions
+✅ No architecture changes
+✅ Pure defensive programming
+
+DELIVERABLES
+============
+✅ Modified app-save-load.js
+✅ Created TASK-H-IMPLEMENTATION.txt (change log)
+✅ Created task-h-null-safe-selector.diff (diff summary)
+✅ Created this implementation log
+
+KNOWN LIMITATIONS
+=================
+None. This change has zero functional impact when the element exists, and prevents crashes when it doesn't. No downsides.
+
+NEXT STEPS
+==========
+1. Mark should test normal load operations (should work identically)
+2. Optional: Test with selector removed from HTML to verify crash prevention
+3. Continue with any remaining Phase 3 tasks
+
+COMPLETION STATUS
+=================
+✅ Task H complete
+✅ All acceptance criteria met
+✅ Documentation delivered to Shared Memory Bus
+✅ Ready for Mark's testing

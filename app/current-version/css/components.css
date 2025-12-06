@@ -1,0 +1,427 @@
+/* ============================================
+   REUSABLE COMPONENTS - BUTTONS, INPUTS, CARDS
+   ============================================ */
+
+/* BUTTONS */
+.btn {
+    padding: 13px 26px;
+    border-radius: var(--radius-full);
+    font-size: 1.05em;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    border: none;
+    outline: none;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+}
+
+/* NOTE: .btn-primary and .btn-secondary are now defined in modals.css
+   for unified modal button styling (Sprint K) */
+
+.btn-ghost {
+    background: var(--color-primary-lighter);
+    color: var(--color-primary-dark);
+}
+
+.btn-ghost:hover {
+    transform: scale(1.035);
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+/* View Toggle Buttons */
+.view-toggle {
+    padding: 10px 20px;
+    border: 2px solid var(--color-primary);
+    background: var(--color-white);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    color: var(--color-primary);
+    font-family: var(--font-primary);
+    font-weight: 700;
+    transition: var(--transition-normal);
+}
+
+.view-toggle:hover {
+    transform: scale(1.1);
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+.view-toggle.active {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+.view-toggle.active:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+
+/* ============================================
+   TOAST NOTIFICATIONS
+   ============================================ */
+
+.toast-container {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background: var(--color-white);
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    opacity: 0;
+    /* GSAP handles animation */
+    transform: translateX(400px);
+    /* GSAP handles animation */
+    /* transition: all 0.3s ease; - GSAP handles animation */
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.toast-success {
+    border-left: 4px solid #10b981;
+}
+
+.toast-success .toast-icon {
+    background: #d1fae5;
+    color: #10b981;
+}
+
+.toast-error {
+    border-left: 4px solid #ef4444;
+}
+
+.toast-error .toast-icon {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.toast-info {
+    border-left: 4px solid var(--color-secondary);
+}
+
+.toast-info .toast-icon {
+    background: var(--color-secondary-lighter);
+    color: var(--color-secondary);
+}
+
+/* ============================================
+   SPRINT A: VALIDATION ERROR STATES
+   ============================================ */
+
+/* Field Error State */
+.field-error {
+    border: 2px solid #dc2626 !important;
+    background-color: #fef2f2 !important;
+}
+
+.field-error-message {
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 4px;
+    font-weight: 500;
+    font-family: var(--font-primary);
+}
+
+.form-field .field-error-message {
+    padding-left: 4px;
+}
+
+/* Validation Toast (bottom-centered) */
+.validation-toast {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #351F65;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: var(--font-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    transition: bottom 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+}
+
+.validation-toast.show {
+    bottom: 32px;
+}
+
+/* ============================================
+   DEC 2025: TOGGLE SWITCH COMPONENT
+   ============================================ */
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 56px;
+    height: 28px;
+    cursor: pointer;
+}
+
+.toggle-switch input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e0;
+    border-radius: 28px;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-slider:before {
+    content: "";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+input[type="checkbox"]:checked + .toggle-slider {
+    background-color: var(--color-primary);
+}
+
+input[type="checkbox"]:checked + .toggle-slider:before {
+    transform: translateX(28px);
+}
+
+input[type="checkbox"]:focus + .toggle-slider {
+    box-shadow: 0 0 0 3px rgba(53, 31, 101, 0.2);
+}
+
+/* Hover effect */
+.toggle-switch:hover .toggle-slider {
+    opacity: 0.9;
+}
+
+/* ============================================
+   SPRINT K: Modal-specific overlays removed
+   Export and Link overlays now use unified modal system
+   See modals.css for .modal-overlay, .modal-title, etc.
+   ============================================ */
+
+/* ============================================
+   SPRINT L: DUPLICATE PRELOADER (INLINE)
+   ============================================ */
+
+.inline-preloader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 1200;
+    /* above main UI, below modals */
+}
+
+.inline-preloader.active {
+    display: block;
+}
+
+.inline-preloader-content {
+    background: #ffffff;
+    border-radius: 32px;
+    padding: 24px 32px;
+    box-shadow: 0 10px 25.5px rgba(5, 0, 30, 0.1575);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-family: var(--font-primary);
+}
+
+.inline-preloader-spinner {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+}
+
+.inline-preloader-text {
+    font-size: 20px;
+    color: #351F65;
+    white-space: nowrap;
+}
+
+/* ============================================
+   GSAP BUTTON EFFECTS - WIPE OVERLAYS
+   ============================================ */
+
+/* CRITICAL: Disable CSS transitions on wipe buttons to prevent double-hover effect */
+.wipe-btn {
+    position: relative;
+    overflow: hidden;
+    transition: none !important;
+}
+
+/* Also disable transitions on hover for wipe buttons */
+.wipe-btn:hover {
+    transition: none !important;
+}
+
+/* Reset focus states to prevent stuck hover appearance */
+.wipe-btn:focus {
+    outline: none;
+}
+
+.wipe-btn:focus:not(:hover) {
+    /* Reset to default state when focused but not hovering */
+    transform: scale(1) !important;
+}
+
+/* CRITICAL: Prevent CSS hover background/color changes - only GSAP wipe should show */
+.btn-primary.wipe-btn:hover {
+    background: #4A2FFF !important; /* Keep original background */
+    color: #ffffff !important; /* Keep original text color */
+}
+
+.btn-secondary.wipe-btn:hover {
+    background: #E4DDFC !important; /* Keep original background */
+    color: #351F65 !important; /* Keep original text color */
+}
+
+#my-designs-btn.wipe-btn:hover {
+    background: transparent !important; /* Keep original transparent background */
+    color: #351F65 !important; /* Keep original text color */
+    border-color: #351F65 !important; /* Change border to purple on hover */
+}
+
+/* Reset My Designs button when focused but not hovering */
+#my-designs-btn.wipe-btn:focus:not(:hover) {
+    border-color: #6240E8 !important; /* Back to original border color */
+}
+
+.view-toggle.wipe-btn:hover {
+    background: var(--color-white) !important; /* Keep original white background */
+    color: var(--color-primary) !important; /* Keep original purple text */
+    border-color: var(--color-primary) !important; /* Keep original border */
+}
+
+#templates-btn.wipe-btn:hover {
+    background: var(--color-primary) !important; /* Keep original purple background */
+}
+
+/* Wipe overlay - positioned absolutely to cover button */
+.circular-wipe-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: circle(0% at 50% 50%);
+    pointer-events: none;
+    z-index: 2;
+    border-radius: inherit;
+}
+
+/* Text inside wipe overlay */
+.btn-text-overlay {
+    position: relative;
+    z-index: 3;
+}
+
+/* Base button text */
+.btn-text {
+    position: relative;
+    z-index: 1;
+}
+
+/* WIPE COLOR SCHEMES - Using Teladoc colors with better contrast */
+
+/* Landing Templates Button: same purple #351F65 */
+#templates-btn.wipe-btn .circular-wipe-overlay {
+    background: #351F65;
+    color: #ffffff;
+}
+
+/* Landing My Designs Button: transparent/hollow → solid purple #351F65 */
+#my-designs-btn.wipe-btn .circular-wipe-overlay {
+    background: #351F65;
+    color: #ffffff;
+}
+
+/* Modal Primary Buttons: #4A2FFF → lighter purple for visibility */
+.btn-primary.wipe-btn .circular-wipe-overlay {
+    background: #5a3faa;
+    color: #ffffff;
+}
+
+/* Modal Secondary Buttons: #E4DDFC (light purple) → solid purple #351F65 */
+.btn-secondary.wipe-btn .circular-wipe-overlay {
+    background: #351F65;
+    color: #ffffff;
+}
+
+/* View Toggle Buttons: white + border → solid purple #351F65 */
+.view-toggle.wipe-btn .circular-wipe-overlay {
+    background: #351F65;
+    color: #ffffff;
+}
+
+/* Generic button hover states */
+.btn.wipe-btn .circular-wipe-overlay {
+    background: #351F65;
+    color: #ffffff;
+}

@@ -1,0 +1,84 @@
+TASK I DIFF SUMMARY: Builder Header Title System
+================================================
+
+FILE 1: js/app-core.js
+----------------------
+
+ADDITIONS:
++ Line 17: Added window.builderMode = 'template' flag
++ Lines 135-140: Set builderMode and call updateBuilderHeader in loadTemplateByKey
++ Lines 152-184: New updateBuilderHeader() function with mode-based logic
++ Line 187: Exposed updateBuilderHeader globally
++ Lines 189-199: Refactored updateBuilderTemplateTitle to use new helper
+
+KEY LOGIC ADDED:
+```javascript
+// In loadTemplateByKey:
+window.builderMode = 'template';
+updateBuilderHeader({
+    mode: 'template',
+    templateName: templateDefinition.name || key
+});
+
+// New helper function:
+function updateBuilderHeader({ mode, templateName, designName }) {
+    // Mode-specific logic for title and subtitle
+}
+```
+
+FILE 2: js/app-save-load.js
+----------------------------
+
+MODIFICATIONS:
+~ Lines 263-272: loadProjectFromComputer() - Replaced manual title update with updateBuilderHeader call
+~ Lines 338-347: loadProject() - Replaced manual title update with updateBuilderHeader call  
+~ Lines 535-543: saveToMyDesignsWithFolder() - Replaced manual title update with updateBuilderHeader call
+~ Lines 615-623: loadDesignFromCard() - Replaced manual title update with updateBuilderHeader call
+
+PATTERN REPLACED:
+```javascript
+// OLD PATTERN (repeated 4 times):
+setTimeout(() => {
+    const builderTitle = document.getElementById('builder-template-title');
+    const projectInfoDisplay = document.getElementById('project-info-display');
+    const projectNameDisplay = document.getElementById('project-name-display');
+    
+    if (builderTitle && projectInfoDisplay && projectNameDisplay) {
+        builderTitle.textContent = saveData.projectName;
+        const templateName = templates[templateKey]?.name || 'Unknown Template';
+        projectNameDisplay.textContent = templateName;
+        projectInfoDisplay.style.display = 'flex';
+    }
+}, 50);
+
+// NEW PATTERN:
+setTimeout(() => {
+    window.builderMode = 'design';
+    const templateName = templates[templateKey]?.name || 'Unknown Template';
+    if (typeof window.updateBuilderHeader === 'function') {
+        window.updateBuilderHeader({
+            mode: 'design',
+            designName: saveData.projectName,
+            templateName: templateName
+        });
+    }
+}, 50);
+```
+
+BENEFITS OF REFACTOR:
+---------------------
+1. Centralized header update logic in one function
+2. Clear mode distinction (template vs design)
+3. Consistent behavior across all load operations
+4. Reduced code duplication (4 manual updates → 4 helper calls)
+5. Easier to maintain and extend
+6. Better error handling and logging
+7. Mode flag enables future mode-specific features
+
+TOTAL CHANGES:
+--------------
+- 2 files modified
+- ~90 lines added to app-core.js
+- ~40 lines modified in app-save-load.js
+- 0 breaking changes
+- 100% backward compatible

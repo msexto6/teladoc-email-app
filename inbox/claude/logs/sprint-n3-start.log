@@ -1,0 +1,20 @@
+SPRINT N3: Make Example Defaults Apply to ALL Templates
+=======================================================
+Task: Implement clear "new vs existing" design flag to control when example defaults are applied
+
+Started: 2025-11-30
+Source: GPT-5.1 Task List
+
+Analysis:
+- applyExampleDefaults() function exists in app-form.js
+- Currently gated by isLoadingSavedDesign flag
+- Standard Template works because it has defaultValue properties
+- Other templates (Partner Essentials NL, Consultant Connect NL, etc.) only have placeholder
+- Need to apply example defaults based on design state, not loading state
+
+Files to modify:
+1. app-save-load.js - Add currentDesignId tracking
+2. app-core.js - Add isNewDesign() helper
+3. app-form.js - Update applyExampleDefaults calls to use isNewDesign()
+
+Step 1: Add currentDesignId to app-save-load.js...

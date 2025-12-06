@@ -1,0 +1,164 @@
+/* ============================================
+   REUSABLE COMPONENTS - BUTTONS, INPUTS, CARDS
+   ============================================ */
+
+/* BUTTONS */
+.btn {
+    padding: 13px 26px;
+    border-radius: var(--radius-full);
+    font-size: 1.05em;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    border: none;
+    outline: none;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.btn-primary:hover {
+    transform: scale(1.1);
+    background: var(--color-primary-dark);
+}
+
+.btn-secondary {
+    background: var(--color-white);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+.btn-secondary:hover {
+    transform: scale(1.1);
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+.btn-ghost {
+    background: var(--color-primary-lighter);
+    color: var(--color-primary-dark);
+}
+
+.btn-ghost:hover {
+    transform: scale(1.035);
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+/* View Toggle Buttons */
+.view-toggle {
+    padding: 10px 20px;
+    border: 2px solid var(--color-primary);
+    background: var(--color-white);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    color: var(--color-primary);
+    font-family: var(--font-primary);
+    font-weight: 700;
+    transition: var(--transition-normal);
+}
+
+.view-toggle:hover {
+    transform: scale(1.1);
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+.view-toggle.active {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+.view-toggle.active:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+
+/* ============================================
+   TOAST NOTIFICATIONS
+   ============================================ */
+
+.toast-container {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background: var(--color-white);
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.toast-success {
+    border-left: 4px solid #10b981;
+}
+
+.toast-success .toast-icon {
+    background: #d1fae5;
+    color: #10b981;
+}
+
+.toast-error {
+    border-left: 4px solid #ef4444;
+}
+
+.toast-error .toast-icon {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.toast-info {
+    border-left: 4px solid var(--color-secondary);
+}
+
+.toast-info .toast-icon {
+    background: var(--color-secondary-lighter);
+    color: var(--color-secondary);
+}

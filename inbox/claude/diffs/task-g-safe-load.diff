@@ -1,0 +1,66 @@
+DIFF SUMMARY - TASK G: Harden Saved Design Loading
+===================================================
+
+FILE: js/app-save-load.js
+
+ADDED FUNCTIONS (Lines 56-152):
+
++ applySavedFormDataToDOM(savedFormData = {})
+  - Safely restores form field values from saved data
+  - Never throws on missing elements
+  - Logs warnings for skipped fields
+  - Dispatches input events for counter/preview sync
+
++ applySavedImagesToDOM(savedUploadedImages = {})
+  - Safely restores images to drop zones
+  - Never throws on missing elements
+  - Logs warnings for skipped image slots
+  - Uses restoreUploadedImages() helper or falls back to direct DOM
+
+MODIFIED FUNCTIONS:
+
+loadDesignFromCard() (Lines 724-844):
+  OLD:
+    populateFormFields();
+    if (typeof restoreUploadedImages === 'function' && ...) {
+        restoreUploadedImages(uploadedImages);
+    }
+  
+  NEW:
+    applySavedFormDataToDOM(formData);
+    applySavedImagesToDOM(uploadedImages);
+
+loadProjectFromComputer() (Lines 248-306):
+  OLD:
+    generateForm();
+    populateFormFields();
+    if (typeof restoreUploadedImages === 'function') {
+        restoreUploadedImages(uploadedImages);
+    }
+  
+  NEW:
+    generateForm();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    applySavedFormDataToDOM(formData);
+    applySavedImagesToDOM(uploadedImages);
+
+loadProject() (Lines 313-402):
+  OLD:
+    generateForm();
+    populateFormFields();
+    if (typeof restoreUploadedImages === 'function') {
+        restoreUploadedImages(uploadedImages);
+    }
+  
+  NEW:
+    generateForm();
+    setTimeout(() => {
+        applySavedFormDataToDOM(formData);
+        applySavedImagesToDOM(uploadedImages);
+    }, 100);
+
+IMPACT:
+- No more null.value crashes when loading saved designs
+- Graceful handling of template changes
+- Clear console warnings for debugging
+- All existing functionality preserved

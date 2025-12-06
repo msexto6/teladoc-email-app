@@ -1,0 +1,102 @@
+# PHASE 3 TASK F-FIX - CORRECTED IMPLEMENTATION
+
+**Date:** November 22, 2025  
+**Issue:** Fixed wrong file - buttons were hidden by `css/builder.css`, not `css/styles.css`
+
+---
+
+## THE PROBLEM
+
+Initial fix was applied to `css/styles.css` but the actual rule hiding the buttons was in `css/builder.css`.
+
+**CSS Cascade Order:**
+1. `css/base.css`
+2. `css/masthead.css`
+3. `css/layout.css`
+4. `css/landing.css`
+5. **`css/builder.css`** ← This file's rules override styles.css
+6. `css/preview.css`
+7. ... (other CSS files)
+
+Since `builder.css` loads after `styles.css`, its `.action-buttons { display: none; }` rule was overriding our fix.
+
+---
+
+## THE CORRECT FIX
+
+**File:** `css/builder.css` (Lines ~303-310)
+
+### BEFORE:
+```css
+/* ACTION BUTTONS */
+.action-buttons {
+    display: none;
+    gap: 15px;
+    margin-top: var(--spacing-lg);
+}
+
+.action-buttons.active {
+    display: flex;
+}
+```
+
+### AFTER:
+```css
+/* ACTION BUTTONS - PHASE 3 TASK F FIX */
+.action-buttons {
+    display: flex;           /* Was: display: none; */
+    gap: 15px;
+    margin-top: var(--spacing-lg);
+}
+
+.action-buttons.active {
+    display: flex;
+}
+```
+
+---
+
+## WHAT CHANGED
+
+1. Changed `display: none;` to `display: flex;` in `css/builder.css`
+2. Added comment explaining the fix
+3. Added inline comment showing previous value
+
+---
+
+## FILES MODIFIED
+
+### Correct Fix:
+- ✅ **`css/builder.css`** - Changed `.action-buttons` display property
+
+### Previous (Ineffective) Fix:
+- ⚠️ `css/styles.css` - Change had no effect due to CSS cascade
+
+---
+
+## VERIFICATION
+
+After this fix:
+- ✅ Four buttons visible: Save, Save As, Copy Link, Export
+- ✅ Buttons positioned at bottom of left column
+- ✅ All buttons functional
+- ✅ No layout breakage
+- ✅ DevTools shows `display: flex` on `.action-buttons`
+
+---
+
+## LESSON LEARNED
+
+Always verify which CSS file contains the actual rule being applied:
+1. Use Chrome DevTools to inspect element
+2. Check "Computed" tab to see which file/line is active
+3. Modify the file that's actually being used
+4. Consider CSS cascade order when multiple files define same selector
+
+In this case, `builder.css` loaded after `styles.css`, so its rules took precedence.
+
+---
+
+**Status:** ✅ FIXED (for real this time!)  
+**File Modified:** `css/builder.css`  
+**Change:** 1 property (`display: none` → `display: flex`)

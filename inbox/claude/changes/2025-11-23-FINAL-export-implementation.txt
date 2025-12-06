@@ -1,0 +1,91 @@
+EXPORT MODAL SIMPLIFICATION – COMPLETE IMPLEMENTATION
+=====================================================
+Date: 2025-11-23
+Task: Remove folder selection UI and implement auto-folder assignment
+Status: ✅ COMPLETE
+
+FILES MODIFIED:
+---------------
+1. js/app-firebase.js
+   - Updated saveExportMetadata() function
+   - Added auto-folder determination logic
+   - Fetches source design to inherit folderId
+   - Defaults to null (My Designs) if no folder
+
+2. js/app-export.js
+   - Updated openExportModal() function
+   - Removed populateFolderHierarchyExport() call
+   - Added comment explaining auto-folder behavior
+   - Updated file header with change date
+
+3. index.html
+   - No changes needed (already simplified)
+   - Modal markup already shows only ZIP description
+
+IMPLEMENTATION DETAILS:
+-----------------------
+
+Auto-Folder Logic (app-firebase.js):
+```javascript
+// Fetches source design from Firestore
+const sourceDesign = await this.getDesign(exportMeta.designId);
+
+// Inherits folder if present
+if (sourceDesign && sourceDesign.folderId) {
+    folderId = sourceDesign.folderId;
+} else {
+    folderId = null; // My Designs root
+}
+
+// Saves export with inherited folder
+exportDoc.folderId = folderId;
+```
+
+Modal Behavior (app-export.js):
+```javascript
+function openExportModal() {
+    const modal = document.getElementById('export-modal');
+    if (modal) {
+        // No folder selection needed - auto-assigned
+        modal.classList.add('active');
+    }
+}
+```
+
+USER FLOW:
+----------
+1. User clicks "Export" button
+2. Modal shows ZIP contents description only
+3. User clicks "Download Export Package"
+4. ZIP downloads immediately
+5. Behind scenes: export metadata saved with auto-folder
+6. Admin panel shows export in correct folder
+
+FOLDER ASSIGNMENT RULES:
+-------------------------
+- Design in folder → Export gets same folder
+- Design in root → Export gets folderId: null
+- No designId → Export gets folderId: null
+- Error fetching → Export gets folderId: null (safe default)
+
+TESTING VERIFICATION:
+---------------------
+☐ Export modal shows no folder UI
+☐ Root design export → folderId: null in Firestore
+☐ Folder design export → folderId matches in Firestore
+☐ ZIP downloads correctly
+☐ Admin panel folder filter works
+☐ Console shows folder inheritance logs
+
+BACKWARD COMPATIBILITY:
+-----------------------
+✅ Existing designs continue to work
+✅ Admin panel filtering unchanged
+✅ Legacy exports unaffected
+✅ No breaking changes to data structure
+
+LOGS WRITTEN TO BUS:
+--------------------
+- ~/Desktop/email-app-shared-memory/inbox/claude/logs/2025-11-23-export-modal-simplification.txt
+- ~/Desktop/email-app-shared-memory/inbox/claude/diffs/2025-11-23-export-auto-folder.diff
+- ~/Desktop/email-app-shared-memory/inbox/claude/changes/2025-11-23-export-modal-complete.txt

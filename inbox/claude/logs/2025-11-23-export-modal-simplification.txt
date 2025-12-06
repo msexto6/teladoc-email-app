@@ -1,0 +1,49 @@
+EXPORT MODAL SIMPLIFICATION – IMPLEMENTATION LOG
+================================================
+Date: 2025-11-23
+Task: Remove folder selection UI from Export modal and implement auto-folder assignment
+
+CHANGES MADE:
+
+1. HTML (index.html) - Export Modal
+   ✅ Modal body already simplified with ZIP contents description
+   ✅ Folder selection UI already removed from markup
+   ✅ Typography already matches spec:
+      - "Your ZIP file will contain:" → 16px, font-weight: 600
+      - Bullet items → 14px standard body text
+      - "Saved to..." line → 14px standard body text
+
+2. Firebase Module (js/app-firebase.js) - saveExportMetadata()
+   ✅ Updated function to auto-determine folder from source design
+   ✅ Logic flow:
+      - If designId provided → fetch source design from Firestore
+      - If source design has folderId → use that folder
+      - If no folder or no design → default to null (My Designs root)
+   ✅ Added folderId field to export metadata document
+   ✅ Enhanced logging to show folder inheritance
+
+3. Export Logic (js/app-export.js)
+   ✅ Already calls saveExportMetadata() correctly
+   ✅ Passes designId from window.currentLocalStorageKey
+   ✅ No changes needed - function will automatically pick up folder
+
+BEHAVIOR:
+- Export modal shows only ZIP description + buttons
+- No folder selection UI visible
+- Behind the scenes: export metadata inherits folder from source design
+- If design is in "Q4 Campaign" folder → export logged to "Q4 Campaign"
+- If design is in root → export logged to "My Designs" (null folder)
+- Admin Export History panel will correctly filter by folder
+
+TESTING CHECKLIST:
+☐ Open Export modal → see only ZIP description, no folder UI
+☐ Export a design from root → check Admin panel shows folderId: null
+☐ Export a design from a folder → check Admin panel shows correct folderId
+☐ Verify exported files still download correctly
+☐ Verify Admin panel folder filtering still works
+
+AFFECTED FILES:
+- /Users/marksexton/Desktop/Email-Briefing-App/index.html (no changes - already correct)
+- /Users/marksexton/Desktop/Email-Briefing-App/js/app-firebase.js (updated saveExportMetadata)
+
+STATUS: ✅ COMPLETE - Ready for testing

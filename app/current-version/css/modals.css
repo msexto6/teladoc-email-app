@@ -1,0 +1,337 @@
+/* ============================================
+   UNIFIED MODAL DESIGN SYSTEM (Sprint K)
+   ============================================ */
+
+/* A) Overlay */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(53, 31, 101, 0.70); /* Teladoc plum overlay */
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+/* B) Card container */
+.modal-content {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 32px 40px;
+    box-shadow: 0 18px 60px rgba(5, 0, 30, 0.40);
+    width: min(600px, 90vw);
+    font-family: var(--font-primary);
+}
+
+/* Narrower variant for simple messages */
+.modal-content--narrow {
+    width: min(420px, 90vw);
+}
+
+/* C) Typography */
+.modal-title {
+    font-size: 24px;
+    font-family: var(--font-primary-bold);
+    font-weight: 600;
+    color: #351F65;
+    margin-bottom: 12px;
+}
+
+.modal-body {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #351F65;
+    margin-bottom: 20px;
+}
+
+.modal-body p {
+    margin: 0 0 12px;
+}
+
+.modal-body p:last-child {
+    margin-bottom: 0;
+}
+
+.modal-subtext {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #5b4c8f;
+    margin-top: 4px;
+}
+
+/* D) Buttons - Updated with Effra Regular and new hover behavior */
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.btn-primary {
+    border-radius: 999px;
+    padding: 10px 22px;
+    border: none;
+    background: #4A2FFF;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 400; /* Changed from 600 to 400 - Effra Regular */
+    font-family: var(--font-primary);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.btn-primary:hover {
+    background: #351F65; /* Solid Purple → Plum on hover */
+}
+
+.btn-secondary {
+    border-radius: 999px;
+    padding: 10px 22px;
+    border: none;
+    background: #E4DDFC;
+    color: #351F65;
+    font-size: 15px;
+    font-weight: 400; /* Changed from 600 to 400 - Effra Regular */
+    font-family: var(--font-primary);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.btn-secondary:hover {
+    background: #6240E8; /* Light Purple → Purple on hover */
+    color: #ffffff; /* Text turns white on hover */
+}
+
+/* ============================================
+   FUNCTIONAL MODAL ELEMENTS
+   (Keep existing functionality-specific styles)
+   ============================================ */
+
+.modal-input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid var(--color-primary-lighter);
+    border-radius: var(--radius-full);
+    font-size: 15px;
+    margin-bottom: 20px;
+    font-family: var(--font-primary);
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.modal-input.dropdown {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236240E8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 20px;
+    padding-right: 45px;
+}
+
+.folder-label {
+    display: block;
+    font-family: var(--font-primary);
+    font-size: 16px;
+    color: var(--color-primary-dark);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+/* Folder Color Picker */
+.folder-color-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.color-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.color-option:hover {
+    background: var(--color-primary-lightest);
+    border-color: var(--color-primary);
+}
+
+.color-option.selected {
+    background: var(--color-primary-lightest);
+    border-color: var(--color-primary);
+}
+
+.color-option img {
+    width: 48px;
+    height: 48px;
+}
+
+.color-option span {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    color: var(--color-primary-dark);
+    font-weight: 500;
+}
+
+/* Folder Selection */
+.folder-selection {
+    margin-bottom: 20px;
+}
+
+.folder-selection label {
+    display: block;
+    font-family: var(--font-primary);
+    font-size: 16px;
+    color: var(--color-primary-dark);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.folder-hierarchy {
+    /* Existing folder hierarchy styles preserved */
+}
+
+/* Export Package Description */
+.export-description {
+    margin-bottom: 24px;
+}
+
+/* Export Spinner (for loading state) */
+.export-spinner {
+    max-width: 120px;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Color Options Container */
+.color-options {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Folder Color Selection */
+.folder-color-selection {
+    margin-bottom: 24px;
+}
+
+.folder-color-selection label {
+    display: block;
+    font-family: var(--font-primary);
+    font-size: 16px;
+    color: var(--color-primary-dark);
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+/* Export Overlay States */
+.export-overlay-state {
+    /* Container for loading/success states */
+}
+
+/* Export Overlay Title - 20% smaller to prevent wrapping */
+.export-overlay-state .modal-title {
+    font-size: 19.2px;
+}
+
+/* ============================================
+   CUSTOM ALERT/CONFIRM DIALOGS
+   (Keep existing custom dialog system)
+   ============================================ */
+
+.custom-dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(53, 31, 101, 0.7);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-dialog-overlay.active {
+    display: flex;
+}
+
+.custom-dialog-content {
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.custom-dialog-message {
+    font-family: var(--font-primary);
+    font-size: 20.8px;
+    color: var(--color-primary-dark);
+    margin: 0 0 30px 0;
+    line-height: 1.5;
+}
+
+.custom-dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.custom-dialog-btn {
+    width: 120px;
+    padding: 13px 20px;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 1.05em;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.custom-dialog-btn:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.035);
+}
+
+.custom-dialog-btn-primary {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.custom-dialog-btn-primary:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.035);
+}
+
+.custom-dialog-btn-ghost {
+    background: var(--color-primary-lighter);
+    color: var(--color-primary-dark);
+}
+
+.custom-dialog-btn-ghost:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+    transform: scale(1.035);
+}

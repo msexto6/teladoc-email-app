@@ -1,0 +1,71 @@
+ACCORDION CSS STYLING UPDATE - DIFF
+====================================
+Date: November 30, 2025
+Task: Update accordion visual design per client specifications
+
+CHANGES MADE
+------------
+1. ✅ Accordion headers now use Plum background (#351F65) with white text
+2. ✅ Added white down arrow indicator that rotates when accordion expands
+3. ✅ Changed accordion border to 1px plum outline
+4. ✅ Added 30px spacing between accordion sections
+
+DETAILED CSS CHANGES
+--------------------
+
+--- .form-accordion
+BEFORE: border: 1px solid rgba(0, 0, 0, 0.06);
+AFTER:  border: 1px solid var(--color-primary-dark); /* Plum #351F65 */
+
+--- .accordion-item spacing
+BEFORE: .accordion-item + .accordion-item { border-top: 1px solid rgba(0, 0, 0, 0.06); }
+AFTER:  .accordion-item + .accordion-item {
+          margin-top: 30px;
+          border: 1px solid var(--color-primary-dark);
+          border-radius: var(--radius-xl);
+          overflow: hidden;
+        }
+
+--- .accordion-header background and text
+BEFORE: background: #f7f7fb;
+        color: var(--color-primary-dark);
+AFTER:  background: var(--color-primary-dark); /* Plum */
+        color: var(--color-white); /* White text */
+        padding: 14px 50px 14px 16px; /* Added right padding for arrow */
+
+--- .accordion-header hover
+BEFORE: background: #ededf7;
+AFTER:  background: #2A1952; /* Darker plum */
+
+--- NEW: White down arrow indicator
+.accordion-header::after {
+    content: '';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid var(--color-white); /* White arrow */
+    transition: transform var(--transition-fast);
+}
+
+--- NEW: Arrow rotation when expanded
+.accordion-header[aria-expanded="true"]::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+VISUAL RESULT
+-------------
+- Accordion headers: Plum background with white text
+- Arrow indicator: White triangle pointing down (closed) or up (open)
+- Borders: 1px plum outline around each accordion section
+- Spacing: 30px gap between accordion sections
+- Hover state: Slightly darker plum (#2A1952)
+
+TESTING
+-------
+Page reloaded in Chrome to verify visual changes
+Ready for client review

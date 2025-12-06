@@ -1,0 +1,67 @@
+FIELD REORDERING - STANDARD TEMPLATE & EDUCATION DRIP HP
+========================================================
+Date: 2025-11-30
+File: /Users/marksexton/Desktop/Email-Briefing-App/js/templates.js
+Task: Move Subject Line + Preview Text ABOVE Hero Image
+
+CHANGES MADE:
+-------------
+
+1. STANDARD TEMPLATE ("standard-template"):
+   
+   BEFORE:
+   - hero-image (position 1)
+   - subject-line (position 2)
+   - preview-text (position 3)
+   - headline (position 4)
+   - [remaining fields...]
+
+   AFTER:
+   - subject-line (position 1) ✓
+   - preview-text (position 2) ✓
+   - hero-image (position 3)
+   - headline (position 4)
+   - [remaining fields...]
+
+2. EDUCATION DRIP - HP ("education-drip-hp"):
+   
+   BEFORE:
+   - hero-image (position 1)
+   - subject-line (position 2)
+   - preview-text (position 3)
+   - headline (position 4)
+   - [remaining fields...]
+
+   AFTER:
+   - subject-line (position 1) ✓
+   - preview-text (position 2) ✓
+   - hero-image (position 3)
+   - headline (position 4)
+   - [remaining fields...]
+
+CRITICAL NOTES:
+--------------
+- NO field IDs were changed
+- NO field properties were modified
+- ONLY the array order in the fields[] array was changed
+- This affects VISUAL/DOM rendering order only
+- Save/load/export functionality remains unchanged
+- Existing saved designs will load correctly with new field order
+
+IMPACT:
+-------
+✓ New designs: Subject + Preview appear at top of form
+✓ Existing designs: Load correctly with new field order
+✓ No data migration needed
+✓ No changes to formData structure
+✓ No changes to Excel export mappings
+✓ Example defaults still work correctly
+
+VERIFICATION NEEDED:
+-------------------
+1. Open app and create new Standard Template design
+2. Verify Subject Line and Preview Text appear ABOVE hero image section
+3. Create new Education Drip - HP design
+4. Verify Subject Line and Preview Text appear ABOVE hero image section
+5. Load existing saved design from both templates
+6. Verify fields populate correctly and appear in new order

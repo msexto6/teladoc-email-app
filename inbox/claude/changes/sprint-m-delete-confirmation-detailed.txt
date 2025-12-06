@@ -1,0 +1,169 @@
+SPRINT M - DELETE CONFIRMATION - DETAILED CHANGES
+=================================================
+
+FILE: index.html
+----------------
+LOCATION: After rename-modal (line ~490)
+
+ADDED:
+<!-- Delete Confirmation Modal (Sprint M) -->
+<div id="delete-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-content modal-content--narrow">
+        <h2 class="modal-title">Delete design?</h2>
+        <div class="modal-body">
+            <p>This design will be removed from My Designs. This cannot be undone.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-primary" id="delete-confirm-btn">
+                Delete
+            </button>
+            <button type="button" class="btn-secondary" id="delete-cancel-btn">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+FILE: js/folders-trash.js
+--------------------------
+
+1. HEADER COMMENT UPDATE:
+BEFORE:
+ * SPRINT L: Added Duplicate Preloader (inline, no overlay)
+
+AFTER:
+ * SPRINT L: Added Duplicate Preloader (inline, no overlay)
+ * SPRINT M: Fixed Delete confirmation logic (no more pre-emptive delete)
+
+2. STATE VARIABLES (added after line ~17):
++ // SPRINT M: Track delete modal state
++ let pendingDeleteKey = null;
++ let pendingDeleteFolderId = null;
+
+3. showDesignContextMenu() COMMENT UPDATE:
+BEFORE:
+ * SPRINT J: Context menu now fires for both right-click and ctrl-click
+
+AFTER:
+ * SPRINT J: Context menu now fires for both right-click and ctrl-click
+ * SPRINT M: Delete now opens modal instead of immediate deletion
+
+4. deleteItemDirectly() FUNCTION (line ~1070):
+BEFORE:
+async function deleteItemDirectly(itemKey) {
+    if (!confirm('Delete this item?')) return;
+    await moveToTrash(itemKey);
+}
+
+AFTER:
+/**
+ * SPRINT M: Delete now ONLY opens modal, does NOT delete immediately
+ * Sets pending delete state and opens confirmation modal
+ */
+function deleteItemDirectly(itemKey) {
+    console.log('=== deleteItemDirectly (Sprint M - Modal Version) ===');
+    console.log('itemKey:', itemKey);
+    
+    // Set pending delete state
+    pendingDeleteKey = itemKey;
+    pendingDeleteFolderId = getCurrentFolderId() || null;
+    
+    // Open confirmation modal
+    const modal = document.getElementById('delete-modal');
+    if (modal) {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+    }
+    
+    console.log('✅ Delete confirmation modal opened');
+}
+
+5. NEW FUNCTION closeDeleteModal() (added after deleteItemDirectly):
++ /**
++  * SPRINT M: Close the delete modal and reset state
++  */
++ function closeDeleteModal() {
++     const modal = document.getElementById('delete-modal');
++     if (modal) {
++         modal.classList.remove('active');
++         modal.setAttribute('aria-hidden', 'true');
++     }
++     pendingDeleteKey = null;
++     pendingDeleteFolderId = null;
++ }
+
+6. DOMContentLoaded EVENT HANDLER (added at end, line ~1500):
+
+ADDED:
+    // SPRINT M: Set up Delete Modal handlers
+    const deleteModal = document.getElementById('delete-modal');
+    const deleteCancelBtn = document.getElementById('delete-cancel-btn');
+    const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
+    
+    if (deleteCancelBtn) {
+        deleteCancelBtn.addEventListener('click', () => {
+            // User changed their mind → do nothing
+            console.log('❌ Delete cancelled by user');
+            pendingDeleteKey = null;
+            pendingDeleteFolderId = null;
+            closeDeleteModal();
+        });
+    }
+    
+    if (deleteConfirmBtn) {
+        deleteConfirmBtn.addEventListener('click', async () => {
+            if (!pendingDeleteKey) {
+                closeDeleteModal();
+                return;
+            }
+            
+            console.log('🗑️ Delete confirmed, proceeding with deletion');
+            console.log('  itemKey:', pendingDeleteKey);
+            console.log('  folderId:', pendingDeleteFolderId || '(root)');
+            
+            try {
+                await moveToTrash(pendingDeleteKey);
+                pendingDeleteKey = null;
+                pendingDeleteFolderId = null;
+                closeDeleteModal();
+                console.log('✅ Design deleted successfully');
+            } catch (err) {
+                console.error('Delete failed', err);
+                // Optional: show error notification
+                if (typeof showNotification === 'function') {
+                    showNotification('Unable to delete design. Please try again.', 'error', { scope: 'delete' });
+                }
+                closeDeleteModal();
+            }
+        });
+    }
+    
+    // Close delete modal when clicking backdrop
+    if (deleteModal) {
+        deleteModal.addEventListener('click', (event) => {
+            if (event.target === deleteModal) {
+                pendingDeleteKey = null;
+                pendingDeleteFolderId = null;
+                closeDeleteModal();
+            }
+        });
+    }
+
+CRITICAL FLOW CHANGE
+--------------------
+OLD FLOW:
+1. User clicks "Delete" in context menu
+2. deleteItemDirectly() shows confirm() dialog
+3. If OK: moveToTrash() is called → design deleted
+4. Grid refreshes
+
+NEW FLOW:
+1. User clicks "Delete" in context menu
+2. deleteItemDirectly() sets pending state
+3. deleteItemDirectly() opens modal (design NOT deleted yet)
+4. User clicks "Cancel" → state reset, modal closed, design remains
+5. User clicks "Delete" → moveToTrash() called → design deleted → grid refreshes
+
+KEY DIFFERENCE:
+The design is NO LONGER deleted when the context menu item is clicked.
+Deletion ONLY happens when the modal's confirm button is clicked.

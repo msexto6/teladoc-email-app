@@ -1,0 +1,33 @@
+DIFF SUMMARY - TASK H: Remove legacy template-selector dependency
+====================================================================
+
+FILE: js/app-save-load.js
+
+MODIFIED FUNCTIONS (3 locations):
+
+1. loadProjectFromComputer() (Line ~260):
+   - document.getElementById("template-selector").value = templateKey;
+   + const templateSelector = document.getElementById("template-selector");
+   + if (templateSelector) {
+   +     templateSelector.value = templateKey;
+   + }
+
+2. loadProject() (Line ~340):
+   - document.getElementById("template-selector").value = templateKey;
+   + const templateSelector = document.getElementById("template-selector");
+   + if (templateSelector) {
+   +     templateSelector.value = templateKey;
+   + }
+
+3. loadDesignFromCard() (Line ~747):
+   - document.getElementById("template-selector").value = templateKey;
+   + const templateSelector = document.getElementById("template-selector");
+   + if (templateSelector) {
+   +     templateSelector.value = templateKey;
+   + }
+
+IMPACT:
+- No crashes when template-selector element is missing
+- Graceful degradation if element removed/renamed
+- Zero functional changes when element exists
+- Pure defensive programming improvement

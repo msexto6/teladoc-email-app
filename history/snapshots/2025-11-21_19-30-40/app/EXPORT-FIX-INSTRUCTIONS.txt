@@ -1,0 +1,41 @@
+=== EXPORT FIX INSTRUCTIONS ===
+
+TWO CHANGES NEEDED IN /js/app-save-load.js:
+
+1. FIND Line 435: 
+   useCORS: true,
+
+2. CHANGE TO:
+   allowTaint: true,
+
+3. FIND Line ~545 (the section that saves to localStorage):
+   localStorage.setItem(exportKey, JSON.stringify(exportData));
+
+4. REPLACE EVERYTHING FROM line ~472 ("const zipBlob =") THROUGH line ~565 ("goBackFromBuilder()")
+   WITH THIS CODE:
+
+        // 3. Generate and download the final zip file
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+
+        // Trigger download
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(zipBlob);
+        link.download = projectName + ".zip";
+        link.click();
+
+        alert("Export package downloaded successfully!\n\nIncludes:\n• Excel brief\n• Email preview PDF\n• Images folder");
+
+        // Restore button text  
+        if (exportBtn) exportBtn.textContent = originalText;
+        
+        closeExportModal();
+
+==== WHAT THIS FIXES ====
+- Canvas taint error: Changes `useCORS: true` to `allowTaint: true`
+- Direct download: Downloads ZIP directly instead of saving to My Designs
+- No file name prompt issue: Creates download automatically with project name
+
+After making these changes, the export will:
+1. Generate the package successfully (no canvas error)
+2. Download directly to your Downloads folder
+3. Not ask for file name (uses project name automatically)

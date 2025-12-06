@@ -1,0 +1,36 @@
+SPRINT E FIX - CSS CLASS CORRECTION DIFF
+=========================================
+Date: 2025-11-25 13:30:06
+File: js/templates/standard-template.js
+
+=== BEFORE (INCORRECT CSS CLASSES) ===
+
+    const featuredSection = `
+        <div class="preview-featured-section">
+            <h3 class="preview-section-title">${featuredTitle}</h3>
+            <div class="preview-feature-grid">
+                ${feature1Card}
+                ${feature2Card}
+            </div>
+        </div>
+    `;
+
+=== AFTER (CORRECT CSS CLASSES) ===
+
+    const featuredSection = `
+        <div class="preview-speakers-section">
+            <h3 class="preview-speakers-title">${featuredTitle}</h3>
+            <div class="preview-features-grid">
+                ${feature1Card}
+                ${feature2Card}
+            </div>
+        </div>
+    `;
+
+=== SUMMARY ===
+Changed 3 CSS class names to match Education Drip - HP:
+1. preview-featured-section → preview-speakers-section
+2. preview-section-title → preview-speakers-title  
+3. preview-feature-grid → preview-features-grid
+
+Result: Featured content now displays in proper 2-column grid layout

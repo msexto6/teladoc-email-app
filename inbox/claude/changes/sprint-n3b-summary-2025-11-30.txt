@@ -1,0 +1,61 @@
+SPRINT N3b HOTFIX - CHANGES SUMMARY
+===================================
+Timestamp: 2025-11-30
+Sprint: N3b (Example Defaults Universal Application)
+Status: COMPLETED ✅
+
+QUICK SUMMARY
+-------------
+Fixed: Example defaults now apply to ALL templates (not just Standard)
+Method: Wired applyExampleDefaults() into actual code paths
+Impact: Universal, backwards-compatible, safe
+
+CHANGES MADE
+------------
+1. js/app-core.js → loadTemplateByKey()
+   - Added initialization + example defaults after state reset
+   - Ensures NEW designs get defaults for all templates
+   
+2. js/app-save-load.js → loadDesignById()
+   - Added example defaults after template validation
+   - Ensures EXISTING designs fill empty fields with defaults
+
+WHY THIS WORKS
+--------------
+- applyExampleDefaults() is "empty-only" (won't overwrite existing values)
+- Safe to call for both new and existing designs
+- No dependency on isNewDesign() or currentDesignId
+- Works across all template types
+
+TESTING CHECKLIST
+-----------------
+[ ] New design: Select template → fields have examples
+[ ] Existing design: Open saved design → values preserved
+[ ] Partial design: Open design with blanks → blanks filled
+[ ] All templates: Test Standard, Partner NL, Consultant NL, etc.
+
+FILES MODIFIED
+--------------
+- /Users/marksexton/Desktop/Email-Briefing-App/js/app-core.js (8 lines)
+- /Users/marksexton/Desktop/Email-Briefing-App/js/app-save-load.js (4 lines)
+
+DOCUMENTATION CREATED
+---------------------
+- ~/Desktop/email-app-shared-memory/inbox/claude/logs/sprint-n3b-implementation-2025-11-30.md
+- ~/Desktop/email-app-shared-memory/inbox/claude/diffs/sprint-n3b-diffs-2025-11-30.txt
+- ~/Desktop/email-app-shared-memory/inbox/claude/changes/sprint-n3b-summary-2025-11-30.txt (this file)
+
+ARCHITECTURAL NOTES
+-------------------
+- This fix simplifies the system by removing isNewDesign() dependency
+- Example defaults are now purely field-emptiness-based
+- More reliable than tracking design state
+- Backwards compatible with all saved designs
+
+ROLLBACK INSTRUCTIONS
+----------------------
+If issues arise, remove the added code blocks:
+1. In app-core.js: Remove 8 lines after "SPRINT N3: Clear currentDesignId"
+2. In app-save-load.js: Remove 4 lines after template validation checks
+
+NO OTHER CHANGES NEEDED - applyExampleDefaults() function unchanged.

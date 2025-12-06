@@ -1,0 +1,14 @@
+Font Base64 Data:
+
+/* Dalton Maag - Effra.woff */
+Base64 length: 86968 characters
+data:font/woff;base64,d09GRgABAAAAAP7IABIAAAACcYAAAQBwAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAD+rAAAABwAAAAcd2QwV0dERUYAALEAAAAA...
+
+================================================================================
+
+/* RecklessNeue-Bold.woff */
+Base64 length: 73500 characters
+data:font/woff;base64,d09GRgABAAAAANdUABIAAAACDhAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAADXOAAAABwAAAAclGSqsEdERUYAALpsAAAA...
+
+================================================================================
+

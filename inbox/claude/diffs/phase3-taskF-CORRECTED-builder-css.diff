@@ -1,0 +1,65 @@
+# DIFF: css/builder.css - CORRECTED FIX
+# Phase 3 Task F - Footer Action Buttons Visibility
+
+## Location: css/builder.css (Lines ~303-310)
+
+### BEFORE:
+```css
+/* ACTION BUTTONS */
+.action-buttons {
+    display: none;
+    gap: 15px;
+    margin-top: var(--spacing-lg);
+}
+
+.action-buttons.active {
+    display: flex;
+}
+```
+
+### AFTER:
+```css
+/* ACTION BUTTONS - PHASE 3 TASK F FIX */
+.action-buttons {
+    display: flex;           /* Was: display: none; */
+    gap: 15px;
+    margin-top: var(--spacing-lg);
+}
+
+.action-buttons.active {
+    display: flex;
+}
+```
+
+---
+
+## Summary:
+
+**Changed:** 1 property value
+- `display: none;` → `display: flex;`
+
+**Added:** 2 comment lines
+- Header comment explaining the section
+- Inline comment showing previous value
+
+**Result:** Footer action buttons now visible
+
+---
+
+## Why This File?
+
+The app loads CSS files in this order (from index.html):
+1. css/base.css
+2. css/masthead.css
+3. css/layout.css
+4. css/landing.css
+5. **css/builder.css** ← This file
+6. css/preview.css
+7. css/modals.css
+8. css/components.css
+9. css/animations.css
+10. css/folders-trash.css
+
+Since `builder.css` loads AFTER `styles.css`, its rules take precedence due to CSS cascade order.
+
+The initial fix to `styles.css` was overridden by this file's rule.

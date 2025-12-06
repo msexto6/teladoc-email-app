@@ -1,0 +1,20 @@
+--- css/masthead.css (BEFORE)
++++ css/masthead.css (AFTER)
+
+@@ Line 104 @@
+ .templates-dropdown {
+     position: absolute;
+     top: 100%;
+     left: 50%;
+     transform: translateX(-50%);
+-    margin-top: 10px; /* Gap between underline and dropdown */
++    margin-top: -2px; /* Slight overlap to eliminate any pixel seam */
+     background: white;
+     border-radius: var(--radius-lg);
+     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+
+CHANGE SUMMARY:
+- Changed margin-top from 10px to -2px
+- This eliminates the dead zone between "Templates" nav item and its dropdown
+- Creates a tiny 2px overlap to prevent any pixel seams
+- Dropdown now stays open when moving cursor from label down to menu items

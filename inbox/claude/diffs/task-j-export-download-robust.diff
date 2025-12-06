@@ -1,0 +1,199 @@
+TASK J DIFF SUMMARY: Export Download Reliability
+================================================
+
+FILE 1: js/app-export.js
+------------------------
+
+ADDITIONS:
++ Lines 138-146: Added export schema documentation in exportAsExcel
++ Lines 287-445: New downloadExportFromCard() function with robust download logic
++ Lines 447-455: Updated downloadExportFile() to redirect to new function
++ Lines 457-459: Global exposure of both functions
+
+REPLACED FUNCTION:
+```javascript
+// OLD (lines ~270-288 in original):
+async function downloadExportFile(exportKey) {
+    try {
+        const dataStr = await dbGet(exportKey);
+        if (!dataStr) {
+            alert("Export file not found");
+            return;
+        }
+        
+        const exportData = JSON.parse(dataStr);
+        if (!exportData.isExport) {
+            alert("Invalid export file");  // ← Generic error
+            return;
+        }
+
+        // Convert base64 back to blob
+        const byteString = atob(exportData.fileData.split(',')[1]);
+        // ... rest of Base64 conversion
+    } catch (err) {
+        console.error("Error downloading export:", err);
+        alert("Error downloading file: " + err.message);
+    }
+}
+
+// NEW (lines 287-455):
+async function downloadExportFromCard(exportKey) {
+    try {
+        console.log("=== downloadExportFromCard called ===");
+        console.log("📦 Export key:", exportKey);
+        
+        const dataStr = await dbGet(exportKey);
+        if (!dataStr) {
+            console.error("❌ Export not found in IndexedDB");
+            alert("Export file not found. It may have been deleted.");
+            return;
+        }
+        
+        const rawData = JSON.parse(dataStr);
+        const exportData = rawData.data || rawData;
+        
+        // Log export document schema for diagnostics
+        console.log("📋 Export doc schema (keys present):", Object.keys(exportData));
+        console.log("📋 Full export data:", exportData);
+        
+        if (!exportData.isExport) {
+            console.error("❌ Document is not an export");
+            alert("This doesn't appear to be a valid export file.");
+            return;
+        }
+        
+        // ============================================
+        // DETERMINE DOWNLOAD METHOD
+        // ============================================
+        
+        let downloadMethod = null;
+        let downloadUrl = null;
+        let filename = exportData.fileName || exportData.projectName || 'export.zip';
+        
+        // Method 1: Firebase Storage URL (future support)
+        if (exportData.storageUrl || exportData.downloadUrl) {
+            downloadMethod = 'storageUrl';
+            downloadUrl = exportData.storageUrl || exportData.downloadUrl;
+            console.log("✓ Download method selected: Firebase Storage URL");
+        }
+        // Method 2: Legacy Base64 data
+        else if (exportData.fileData) {
+            downloadMethod = 'base64';
+            console.log("✓ Download method selected: Base64 (legacy format)");
+        }
+        // Method 3: No usable data
+        else {
+            downloadMethod = 'missing';
+            console.error("❌ Download method: MISSING");
+        }
+        
+        // ============================================
+        // EXECUTE DOWNLOAD
+        // ============================================
+        
+        if (downloadMethod === 'storageUrl') {
+            // Firebase Storage URL download
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = filename;
+            link.target = "_blank";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            console.log("✅ Download triggered via storage URL");
+            
+        } else if (downloadMethod === 'base64') {
+            // Base64 Blob reconstruction with detailed logging
+            try {
+                const parts = exportData.fileData.split(',');
+                const mimeString = parts[0].split(':')[1].split(';')[0];
+                const byteString = atob(parts[1]);
+                
+                console.log("📊 MIME type:", mimeString);
+                console.log("📊 Decoded byte length:", byteString.length);
+                
+                // Create Blob with proper type
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                const blob = new Blob([ab], { type: mimeString });
+                
+                console.log("📊 Blob size:", blob.size, "bytes");
+                
+                // Trigger download
+                const objectUrl = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = objectUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(objectUrl), 100);
+                
+                console.log("✅ Download triggered via Base64 Blob");
+            } catch (base64Error) {
+                console.error("❌ Failed to process Base64:", base64Error);
+                alert("Error processing export file. The file may be corrupted.");
+                return;
+            }
+            
+        } else {
+            // No usable download data
+            console.error("❌ Cannot download - no valid data source");
+            alert(
+                "We couldn't find downloadable data for this export.\n\n" +
+                "This may happen if the export is corrupted or incomplete.\n\n" +
+                "Please try exporting your design again."
+            );
+            return;
+        }
+        
+        console.log("=== downloadExportFromCard completed ===");
+        
+    } catch (err) {
+        console.error("❌ ERROR in downloadExportFromCard:", err);
+        alert("Error downloading export file: " + err.message);
+    }
+}
+```
+
+KEY IMPROVEMENTS:
+-----------------
+1. Schema Diagnostics:
+   - Logs all export document keys
+   - Shows full export data structure
+   - Helps debug format issues
+
+2. Multi-Format Support:
+   - Firebase Storage URLs (future)
+   - Base64 data (current)
+   - Clear method selection logging
+
+3. Better Error Messages:
+   - "Export file not found" → User understands deletion
+   - "Invalid export file" → Not a valid export document
+   - "File may be corrupted" → Base64 decode failure
+   - "Try exporting again" → Friendly re-export guidance
+
+4. Detailed Logging:
+   - Start/end markers for each call
+   - Method selection reasoning
+   - Data size information
+   - Success/failure indicators
+
+5. Safety & Cleanup:
+   - Try-catch for Base64 processing
+   - Object URL cleanup after use
+   - Graceful handling of missing fields
+   - No crashes on corrupted data
+
+TOTAL CHANGES:
+--------------
+- 1 file modified (js/app-export.js)
+- ~170 lines added (new function + docs)
+- ~20 lines modified (legacy redirect)
+- 0 breaking changes
+- 100% backward compatible
+- Future-ready for Firebase Storage

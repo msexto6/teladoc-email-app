@@ -1,0 +1,71 @@
+TASK I CHANGE SUMMARY: Builder Header Titles
+============================================
+Implementation: COMPLETE ✓
+Date: November 22, 2025
+
+WHAT WAS IMPLEMENTED
+--------------------
+A builder mode system that correctly differentiates between:
+1. Template Mode - When user opens a template from Templates screen
+2. Design Mode - When user opens a saved design from My Designs
+
+HEADER BEHAVIOR
+----------------
+Template Mode:
+- Main Title: Template name (e.g., "Partner Essentials NL")
+- Subtitle: Hidden
+
+Design Mode:
+- Main Title: Project/Design name (e.g., "Q4 Email Campaign")
+- Subtitle: Template name (e.g., "Partner Essentials NL")
+
+HOW IT WORKS
+------------
+1. State Management:
+   - Added window.builderMode flag ('template' | 'design')
+   - Set when loading templates or designs
+   - Persists across operations
+
+2. Central Update Function:
+   - updateBuilderHeader({ mode, templateName, designName })
+   - Handles all DOM updates safely
+   - Mode-specific logic for show/hide subtitle
+
+3. Integration Points:
+   - loadTemplateByKey() → sets mode='template'
+   - loadDesignFromCard() → sets mode='design'
+   - loadProjectFromComputer() → sets mode='design'
+   - saveToMyDesignsWithFolder() → sets mode='design'
+
+SAFETY & RELIABILITY
+---------------------
+✓ Null checks on all DOM elements
+✓ Console warnings (no hard failures)
+✓ Fallback values for missing data
+✓ Backward compatible with existing code
+✓ Global exposure for cross-module use
+
+TESTING CHECKLIST
+-----------------
+[ ] Open template from Templates screen → verify Template Mode header
+[ ] Open design from My Designs → verify Design Mode header
+[ ] Save new design → verify switches to Design Mode
+[ ] Switch between templates → verify header updates
+[ ] Switch between designs → verify header updates
+[ ] Check console for errors
+
+FILES CHANGED
+-------------
+1. js/app-core.js - Added mode flag and central helper
+2. js/app-save-load.js - Integrated helper into all load functions
+
+DOCUMENTATION
+-------------
+- Implementation Log: ~/email-app-shared-memory/inbox/claude/logs/task-i-builder-header-titles.log
+- Diff Summary: ~/email-app-shared-memory/inbox/claude/diffs/task-i-builder-header-titles.diff
+- Change Summary: This file
+
+READY FOR TESTING
+-----------------
+Yes - All code changes complete and logged.
+Recommend testing all navigation flows between Templates and My Designs.

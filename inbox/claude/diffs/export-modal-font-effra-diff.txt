@@ -1,0 +1,32 @@
+DIFF: css/modals.css - Effra Font Consistency Fix
+=================================================
+
+LINE 25 - .modal-content
+-------------------------
+- font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
++ font-family: var(--font-primary);
+
+LINE 36-37 - .modal-title
+--------------------------
+  .modal-title {
+      font-size: 24px;
++     font-family: var(--font-primary-bold);
+      font-weight: 600;
+      color: #351F65;
+      margin-bottom: 12px;
+  }
+
+IMPACT
+------
+These two changes ensure that:
+1. All modal content uses Effra Regular by default
+2. Modal titles explicitly use Effra Bold font file (not synthetic bold)
+3. Export preloader shows consistent Effra typography
+4. No more Arial/system fonts bleeding through in modals
+
+CSS VARIABLE REFERENCES
+------------------------
+--font-primary: 'Dalton Maag Effra', Arial, sans-serif;
+--font-primary-bold: 'Dalton Maag Effra Bold', Arial, sans-serif;
+
+(Defined in css/base.css, lines 25-26)

@@ -1,0 +1,69 @@
+// Quick fix for exportAsExcel - remove PDF generation temporarily
+// Find the exportAsExcel function and replace the PDF generation section
+
+// Replace this entire section (starting around line 655):
+        // 2. Generate PDF of email preview
+        const previewContent = document.getElementById('preview-content');
+        if (previewContent) {
+            const clonedPreview = previewContent.cloneNode(true);
+            
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.width = '600px';
+            tempContainer.appendChild(clonedPreview);
+            document.body.appendChild(tempContainer);
+
+            try {
+                // Use html2canvas with allowTaint to handle images
+                const canvas = await html2canvas(clonedPreview, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: false,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+
+                // Create PDF using jsPDF
+                const { jsPDF } = window.jspdf;
+                const imgWidth = 210; // A4 width in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                
+                const pdfBlob = pdf.output('blob');
+                zip.file(finalProjectName + "-preview.pdf", pdfBlob);
+
+            } finally {
+                document.body.removeChild(tempContainer);
+            }
+        }
+
+// WITH THIS (simpler, no PDF):
+
+        // 2. Save preview as HTML instead of PDF (avoids canvas tainting issues)
+        const previewContent = document.getElementById('preview-content');
+        if (previewContent) {
+            const previewHTML = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Email Preview - ${finalProjectName}</title>
+    <style>
+        body { margin: 20px; font-family: Arial, sans-serif; }
+    </style>
+</head>
+<body>
+    ${previewContent.innerHTML}
+</body>
+</html>`;
+            
+            zip.file(finalProjectName + "-preview.html", previewHTML);
+        }

@@ -1,0 +1,74 @@
+PHASE 1 - TASK 2 DIFF
+=====================
+File: js/app-images.js
+Timestamp: 2025-11-21_19:43:00
+Operation: Update app-images.js to stop Base64 conversion
+
+MAJOR CHANGES:
+--------------
+
+1. REPLACED FileReader.readAsDataURL() with Firebase Storage Upload
+   OLD:
+   - const reader = new FileReader();
+   - reader.onload = function(evt) {
+   -     uploadedImages[field.id] = evt.target.result;
+   - reader.readAsDataURL(file);
+   
+   NEW:
+   + async function processImageFile(file) {
+   +     const downloadUrl = await EmailBriefingDB.uploadImage(file);
+   +     uploadedImages[field.id] = downloadUrl;
+
+2. UPDATED Event Handlers to Async
+   - paste event handler → async
+   - drop event handler → async  
+   - change event handler → async
+   - All now call processImageFile() instead of FileReader
+
+3. ADDED Loading State During Upload
+   + zone.innerHTML = `
+   +     <div class="image-uploading">
+   +         <div class="upload-spinner"></div>
+   +         <div class="upload-text">Uploading...</div>
+   +     </div>
+   + `;
+
+4. ADDED Error Handling
+   + try/catch block with error display
+   + Temporary error message (3 seconds)
+   + Reset to original state after error
+
+5. ADDED Backward Compatibility Section
+   + function isBase64Image(str)
+   + function restoreUploadedImages(images)
+   - Handles both URLs and Base64 data
+   - Displays existing Base64 without stripping
+
+6. PARAMETER CHANGES
+   - displayImage() now accepts imageUrl instead of dataUrl
+   - All image data stored as URLs in uploadedImages
+
+SECONDARY CHANGES (css/styles.css):
+------------------------------------
++ Added section 16: IMAGE UPLOAD STATES
++ .image-uploading container styles
++ .upload-spinner with rotation animation
++ .upload-text styling
++ @keyframes spin animation
+
+PURPOSE:
+--------
+- Stop storing Base64 in Firestore (prevents 1MB limit crashes)
+- Use Firebase Storage URLs instead
+- Maintain backward compatibility for existing Base64 designs
+- Provide visual feedback during upload
+- Handle upload errors gracefully
+
+VERIFICATION:
+-------------
+✓ All FileReader.readAsDataURL calls removed
+✓ File objects passed to EmailBriefingDB.uploadImage()
+✓ URLs stored in window.uploadedImages
+✓ Backward compatibility maintained
+✓ Loading states added
+✓ Error handling implemented

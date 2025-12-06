@@ -1,0 +1,479 @@
+/* ============================================
+   FOLDERS & TRASH BIN FUNCTIONALITY
+   ============================================ */
+
+/* Folder Card */
+.folder-card {
+    background: transparent;
+    border: none;
+    padding: 10px;
+    cursor: default;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+}
+
+.folder-card.drag-over {
+    transform: scale(1.05);
+}
+
+.folder-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    cursor: default;
+}
+
+.folder-icon {
+    width: 53px;
+    height: 53px;
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.folder-card:hover .folder-icon {
+    transform: scale(1.15);
+}
+
+.folder-card.drag-over .folder-icon {
+    filter: brightness(1.2);
+}
+
+.folder-card-title {
+    font-family: var(--font-primary);
+    font-size: 1.1em;
+    font-weight: 400;
+    color: #351F65;
+    margin: 0;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+    cursor: default;
+}
+
+/* Folder hover colors - match folder color */
+.folder-card[data-color="purple"]:hover .folder-card-title {
+    color: #A498CD;
+}
+
+.folder-card[data-color="aqua"]:hover .folder-card-title {
+    color: #00B5E2;
+}
+
+.folder-card[data-color="green"]:hover .folder-card-title {
+    color: #6EBF7F;
+}
+
+.folder-card[data-color="plum"]:hover .folder-card-title {
+    color: #6240E8;
+}
+
+.folder-card[data-color="berry"]:hover .folder-card-title {
+    color: #CA01BE;
+}
+
+.folder-card.drag-over .folder-card-title {
+    color: var(--color-primary);
+}
+
+/* Draggable Items */
+.design-card.draggable,
+.folder-card.draggable {
+    cursor: grab;
+}
+
+.design-card.dragging,
+.folder-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 0 40px;
+}
+
+.breadcrumb-item {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+}
+
+.breadcrumb-item.current {
+    color: var(--color-gray);
+    cursor: default;
+}
+
+.breadcrumb-item.current:hover {
+    text-decoration: none;
+}
+
+.breadcrumb-separator {
+    color: var(--color-primary-dark);
+    font-size: 18px;
+}
+
+/* Trash Modal */
+.trash-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.trash-modal.active {
+    display: flex;
+}
+
+.trash-modal-content {
+    background: var(--color-white);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.trash-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.trash-modal-header h3 {
+    font-family: var(--font-primary);
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--color-primary-dark);
+    margin: 0;
+}
+
+.trash-close-btn {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: var(--color-gray);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trash-close-btn:hover {
+    color: var(--color-primary);
+}
+
+.trash-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.trash-item {
+    background: var(--color-bg-light);
+    border: 2px solid var(--color-primary-lighter);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+}
+
+.trash-item-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.trash-item-title {
+    font-family: var(--font-primary);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-primary-dark);
+    margin: 0;
+    flex: 1;
+}
+
+.trash-item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.trash-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    transition: transform 0.2s ease;
+}
+
+.trash-action-btn:hover {
+    transform: scale(1.1);
+}
+
+.trash-action-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.trash-action-restore svg {
+    fill: #4CAF50;
+}
+
+.trash-action-delete svg {
+    fill: #F44336;
+}
+
+.trash-item-meta {
+    font-size: 13px;
+    color: var(--color-gray);
+    margin: 4px 0;
+}
+
+.trash-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--color-gray);
+}
+
+.trash-empty-state svg {
+    width: 64px;
+    height: 64px;
+    fill: var(--color-gray-light);
+    margin-bottom: 16px;
+}
+
+/* Folder Selection in Save Modal */
+.folder-selection {
+    margin: 20px 0;
+}
+
+.folder-selection label {
+    display: block;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-primary-dark);
+    margin-bottom: 8px;
+}
+
+.folder-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--color-primary-lighter);
+    border-radius: var(--radius-full);
+    font-family: var(--font-primary);
+    font-size: 14px;
+    color: var(--color-primary-dark);
+    background: var(--color-white);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.folder-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* Context Menu for Folders */
+.folder-context-menu {
+    position: absolute;
+    background: var(--color-white);
+    border: 2px solid var(--color-primary-lighter);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.context-menu-item {
+    padding: 10px 16px;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    color: var(--color-primary-dark);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.context-menu-item:hover {
+    background: var(--color-primary-lighter);
+}
+
+.context-menu-item.danger {
+    color: #F44336;
+}
+
+.context-menu-item.danger:hover {
+    background: rgba(244, 67, 54, 0.1);
+}
+
+/* Selected state for icons */
+.design-card.selected,
+.folder-card.selected,
+.template-card.selected {
+    background: rgba(53, 31, 101, 0.08);
+    border-radius: 12px;
+}
+
+.design-card.selected .document-icon,
+.folder-card.selected .folder-icon {
+    filter: brightness(0.9);
+}
+
+/* Editing state for file names */
+.design-card-title.editing,
+.folder-card-title.editing,
+.template-card-title.editing {
+    background: white;
+    padding: 4px 8px;
+    border: 2px solid var(--color-primary);
+    border-radius: 4px;
+    outline: none;
+    cursor: text;
+    min-width: 100px;
+}
+
+/* Trash bin hover animation */
+.trash-bin {
+    transition: transform 0.3s ease;
+}
+
+.trash-bin.drag-over {
+    transform: scale(1.15);
+}
+
+/* Folder Hierarchy in Save Modal */
+.folder-hierarchy {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 2px solid var(--color-primary-lighter);
+    border-radius: 8px;
+    padding: 10px;
+    background: var(--color-bg-light);
+}
+
+.folder-hierarchy-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.folder-hierarchy-item:hover {
+    background: rgba(53, 31, 101, 0.05);
+}
+
+.folder-hierarchy-item.selected {
+    background: rgba(53, 31, 101, 0.1);
+    border: 1px solid var(--color-primary);
+}
+
+.folder-hierarchy-item.nested {
+    padding-left: 32px;
+}
+
+.folder-hierarchy-item.double-nested {
+    padding-left: 52px;
+}
+
+.folder-hierarchy-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Folder Carat for Expandable Folders */
+.folder-carat {
+    font-size: 12px;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: inline-block;
+    width: 16px;
+    user-select: none;
+}
+
+.folder-carat:hover {
+    color: var(--color-primary-dark);
+}
+
+.folder-carat-placeholder {
+    display: inline-block;
+    width: 16px;
+}
+
+/* Folder Color Modal Styles */
+.folder-color-selection {
+    margin: 30px 0 40px 0;
+}
+
+.folder-color-selection label {
+    display: block;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-primary-dark);
+    margin-bottom: 12px;
+}
+
+.color-options {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.color-option {
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    border-radius: 12px;
+    padding: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.color-option:hover {
+    transform: scale(1.05);
+}
+
+.color-option.selected {
+    border-color: #C4BDD6;
+    background: rgba(53, 31, 101, 0.05);
+}
+
+.color-option img {
+    width: 40px;
+    height: 40px;
+}

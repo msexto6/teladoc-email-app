@@ -1,0 +1,251 @@
+/* ============================================
+   MODAL OVERLAYS & DIALOGS
+   ============================================ */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(53, 31, 101, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    max-width: 500px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    font-family: var(--font-primary);
+    font-size: 28px;
+    color: var(--color-primary-dark);
+    margin-bottom: var(--spacing-lg);
+    font-weight: 400;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid var(--color-primary-lighter);
+    border-radius: var(--radius-full);
+    font-size: 15px;
+    margin-bottom: 20px;
+    font-family: var(--font-primary);
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.modal-input.dropdown {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236240E8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 20px;
+    padding-right: 45px;
+}
+
+.folder-label {
+    display: block;
+    font-family: var(--font-primary);
+    font-size: 16px;
+    color: var(--color-primary-dark);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.export-options {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+.export-option-btn {
+    width: 165px !important;
+    max-width: 165px;
+    padding: 13px 20px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    cursor: pointer;
+    font-size: 1.05em;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    color: var(--color-white);
+    transition: var(--transition-normal);
+    text-align: center;
+    margin-bottom: 0;
+    order: 1;
+}
+
+.export-option-btn:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.035);
+}
+
+.export-option-btn.export-option-ghost {
+    background: var(--color-primary-lighter);
+    color: var(--color-primary-dark);
+}
+
+.export-option-btn.export-option-ghost:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+/* Cancel button (btn-ghost) should be on the right */
+.export-options .btn-ghost {
+    width: 165px !important;
+    max-width: 165px !important;
+    order: 2;
+}
+
+/* Folder Color Picker */
+.folder-color-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.color-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.color-option:hover {
+    background: var(--color-primary-lightest);
+    border-color: var(--color-primary);
+}
+
+.color-option.selected {
+    background: var(--color-primary-lightest);
+    border-color: var(--color-primary);
+}
+
+.color-option img {
+    width: 48px;
+    height: 48px;
+}
+
+.color-option span {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    color: var(--color-primary-dark);
+    font-weight: 500;
+}
+
+/* Ghost button styling override for cancel buttons */
+.btn-ghost {
+    max-width: 165px;
+}
+
+/* ============================================
+   CUSTOM ALERT/CONFIRM DIALOGS
+   ============================================ */
+
+.custom-dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(53, 31, 101, 0.7);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-dialog-overlay.active {
+    display: flex;
+}
+
+.custom-dialog-content {
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.custom-dialog-message {
+    font-family: var(--font-primary);
+    font-size: 20.8px;
+    color: var(--color-primary-dark);
+    margin: 0 0 30px 0;
+    line-height: 1.5;
+}
+
+.custom-dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.custom-dialog-btn {
+    width: 120px;
+    padding: 13px 20px;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 1.05em;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.custom-dialog-btn:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.035);
+}
+
+.custom-dialog-btn-primary {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.custom-dialog-btn-primary:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.035);
+}
+
+.custom-dialog-btn-ghost {
+    background: var(--color-primary-lighter);
+    color: var(--color-primary-dark);
+}
+
+.custom-dialog-btn-ghost:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+    transform: scale(1.035);
+}

@@ -1,0 +1,56 @@
+PHASE 2 - TEMPLATE RESTORATION PATCH - DIFF
+============================================
+Generated: 2025-01-24 14:30:00
+Author: GPT-5.1 (Architect)
+Executor: Claude (Implementation Engineer)
+
+FILE 1: /Users/marksexton/Desktop/Email-Briefing-App/index.html
+-----------------------------------------------------------------
+LINE 145: Changed
+- <select id="template-selector" style="display:none"></select>
++ <select id="template-selector"></select>
+
+REASON: Removed inline style="display:none" to make template selector visible
+
+
+FILE 2: /Users/marksexton/Desktop/Email-Briefing-App/css/builder.css
+--------------------------------------------------------------------
+LINES 315-321: Added (appended to end of file)
++ #template-selector {
++     display: block !important;
++     margin-bottom: 20px;
++     padding: 10px;
++     font-size: 15px;
++     border: 1px solid #ccc;
++     border-radius: 6px;
++ }
+
+REASON: Added visibility CSS rule to ensure template selector is displayed with proper styling
+
+
+FILE 3: /Users/marksexton/Desktop/Email-Briefing-App/js/app-core.js
+--------------------------------------------------------------------
+LINES 11-21: Added (immediately after currentTemplate declaration)
++ document.addEventListener("DOMContentLoaded", function () {
++     const selector = document.getElementById("template-selector");
++     if (!selector) return;
++     selector.innerHTML = ""; // reset
++     const defs = window.templateDefinitions || {};
++     Object.entries(defs).forEach(([id, def]) => {
++         const opt = document.createElement("option");
++         opt.value = id;
++         opt.textContent = def.title || id;
++         selector.appendChild(opt);
++     });
++ });
+
+REASON: Added template population logic to dynamically fill the template selector dropdown
+
+
+SUMMARY:
+--------
+- Removed inline display:none from HTML
+- Added CSS visibility rules with styling
+- Added template population logic on DOMContentLoaded
+- All changes are UI/Builder fixes only
+- No architectural modifications made

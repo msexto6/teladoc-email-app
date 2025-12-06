@@ -1,0 +1,78 @@
+DIFF LOG - Modal Animation Update
+=================================
+Date: 2024-12-01
+File: js/ui-animations.js
+Task: Remove vertical motion, use scale 0.80 ↔ 1.00
+
+CHANGES MADE:
+-------------
+
+1. animateModalOpen() - Dialog animation block:
+   
+   BEFORE:
+   -------
+   if (dialog) {
+       gsap.fromTo(
+           dialog,
+           { y: 16, scale: 0.97, autoAlpha: 0 },
+           {
+               y: 0,
+               scale: 1,
+               autoAlpha: 1,
+               duration: 0.22,
+               ease: "power2.out"
+           }
+       );
+   }
+
+   AFTER:
+   ------
+   if (dialog) {
+       gsap.fromTo(
+           dialog,
+           { y: 0, scale: 0.8, autoAlpha: 0 },
+           {
+               y: 0,
+               scale: 1,
+               autoAlpha: 1,
+               duration: 0.22,
+               ease: "power2.out"
+           }
+       );
+   }
+
+2. animateModalClose() - Dialog animation block:
+   
+   BEFORE:
+   -------
+   if (dialog) {
+       tl.to(dialog, {
+           y: 10,
+           scale: 0.97,
+           autoAlpha: 0,
+           duration: 0.16,
+           ease: "power2.in"
+       }, 0);
+   }
+
+   AFTER:
+   ------
+   if (dialog) {
+       tl.to(dialog, {
+           y: 0,
+           scale: 0.8,
+           autoAlpha: 0,
+           duration: 0.16,
+           ease: "power2.in"
+       }, 0);
+   }
+
+BEHAVIOR:
+---------
+✓ Modals now scale from 80% → 100% on open
+✓ Modals now scale from 100% → 80% on close
+✓ No vertical sliding motion (y remains 0)
+✓ Overlay fade animations unchanged
+✓ Timing and easing unchanged
+
+STATUS: Complete

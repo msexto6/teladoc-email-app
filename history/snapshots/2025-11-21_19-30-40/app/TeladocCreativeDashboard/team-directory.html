@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teladoc Creative Team Directory</title>
+    <style>
+        @font-face {
+            font-family: 'Dalton Maag Effra';
+            src: url('fonts/Dalton Maag - Effra.woff') format('woff'),
+                 url('fonts/Dalton Maag - Effra.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Dalton Maag Effra';
+            src: url('fonts/Dalton Maag - Effra Bold.woff') format('woff'),
+                 url('fonts/Dalton Maag - Effra Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Dalton Maag Effra', Arial, sans-serif;
+            background: linear-gradient(135deg, #351F65 0%, #2D1B4E 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 72px;
+            font-weight: 700;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .director-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px dotted rgba(255,255,255,0.3);
+        }
+
+        .director-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-right: 30px;
+            background: linear-gradient(135deg, #00B5E2, #CA01BE, #6240E8);
+            padding: 3px;
+        }
+
+        .director-photo img,
+        .team-member img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #2D1B4E;
+        }
+
+        .director-info h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .director-info p {
+            font-size: 18px;
+            color: #00B5E2;
+        }
+
+        .team-section {
+            margin-bottom: 50px;
+        }
+
+        .section-header {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #00B5E2;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .team-member {
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+        }
+
+        .member-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            background: #6240E8;
+        }
+        
+        .member-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .team-member:hover .member-photo {
+            border-color: #00B5E2;
+            background: #00B5E2;
+        }
+
+        .member-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .member-title {
+            font-size: 14px;
+            color: #00B5E2;
+        }
+
+        /* Special styling for different departments */
+        .design .section-header { color: #CA01BE; }
+        .copy .section-header { color: #6240E8; }
+        .multimedia .section-header { color: #00B5E2; }
+        .ops .section-header { color: #00E5A0; }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 48px;
+            }
+            
+            .team-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 30px;
+            }
+
+            .member-photo {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Our team</h1>
+        
+        <!-- Director -->
+        <div class="director-section">
+            <a href="mailto:kim.dixson@teladochealth.com" class="director-photo">
+                <img src="images/team/kim.jpg" alt="Kim Dixson">
+            </a>
+            <div class="director-info">
+                <h2>Kim Dixson</h2>
+                <p>Director, Creative</p>
+            </div>
+        </div>
+
+        <!-- Design Team -->
+        <div class="team-section design">
+            <h3 class="section-header">DESIGN</h3>
+            <div class="team-grid">
+                <a href="mailto:jess.argarate@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/jess.jpg" alt="Jess Argarate">
+                    </div>
+                    <div class="member-name">Jess Argarate</div>
+                    <div class="member-title">Sr. Designer</div>
+                </a>
+                <a href="mailto:ro.lalia@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/ro.jpg" alt="Ro Lalia">
+                    </div>
+                    <div class="member-name">Ro Lalia</div>
+                    <div class="member-title">Sr. Designer</div>
+                </a>
+                <a href="mailto:ale.placenti@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/ale.jpg" alt="Ale Placenti">
+                    </div>
+                    <div class="member-name">Ale Placenti</div>
+                    <div class="member-title">Designer</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Copy Team -->
+        <div class="team-section copy">
+            <h3 class="section-header">COPY</h3>
+            <div class="team-grid">
+                <a href="mailto:katy.downey@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/katy.jpg" alt="Katy Downey">
+                    </div>
+                    <div class="member-name">Katy Downey</div>
+                    <div class="member-title">Sr. Copywriter</div>
+                </a>
+                <a href="mailto:kate.kling@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/kate.jpg" alt="Kate Kling">
+                    </div>
+                    <div class="member-name">Kate Kling</div>
+                    <div class="member-title">Sr. Copywriter</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Multimedia Team -->
+        <div class="team-section multimedia">
+            <h3 class="section-header">MULTIMEDIA</h3>
+            <div class="team-grid">
+                <a href="mailto:jody.braverman@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/jody.jpg" alt="Jody Braverman">
+                    </div>
+                    <div class="member-name">Jody Braverman</div>
+                    <div class="member-title">QA</div>
+                </a>
+                <a href="mailto:dave.jenkins@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/dave.jpg" alt="Dave Jenkins">
+                    </div>
+                    <div class="member-name">Dave Jenkins</div>
+                    <div class="member-title">Video</div>
+                </a>
+                <a href="mailto:dan.nyguen@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/dan.jpg" alt="Dan Nyguen">
+                    </div>
+                    <div class="member-name">Dan Nyguen</div>
+                    <div class="member-title">Web</div>
+                </a>
+                <a href="mailto:mark.sexton@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/mark.jpg" alt="Mark Sexton">
+                    </div>
+                    <div class="member-name">Mark Sexton</div>
+                    <div class="member-title">CD</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Operations Team -->
+        <div class="team-section ops">
+            <h3 class="section-header">OPS</h3>
+            <div class="team-grid">
+                <a href="mailto:bel.blanco@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/bel.jpg" alt="Bel Blanco">
+                    </div>
+                    <div class="member-name">Bel Blanco</div>
+                    <div class="member-title">Sr. PM</div>
+                </a>
+                <a href="mailto:lula.chanllio@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/lula.jpg" alt="Lula Chanllio">
+                    </div>
+                    <div class="member-name">Lula Chanllio</div>
+                    <div class="member-title">PM</div>
+                </a>
+                <a href="mailto:carla.dimartino@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/carla.jpg" alt="Carla Di Martino">
+                    </div>
+                    <div class="member-name">Carla Di Martino</div>
+                    <div class="member-title">Sr. PM</div>
+                </a>
+                <a href="mailto:patricia.echague@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/patricia.jpg" alt="Patricia Echague">
+                    </div>
+                    <div class="member-name">Patricia Echague</div>
+                    <div class="member-title">PM</div>
+                </a>
+                <a href="mailto:agus.sanfilippo@teladochealth.com" class="team-member">
+                    <div class="member-photo">
+                        <img src="images/team/agus.jpg" alt="Agus Sanfilippo">
+                    </div>
+                    <div class="member-name">Agus Sanfilippo</div>
+                    <div class="member-title">RM</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

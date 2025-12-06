@@ -1,0 +1,93 @@
+{
+  "id": "alpha-s3-load-pipeline-v2-export-v3-share-v3-admin-v1",
+  "createdAt": "2025-11-23T00:00:00-06:00",
+  "phase": "alpha",
+  "versionTag": "alpha-s3-2025-11-23",
+  "state": "stable-alpha",
+  "summary": {
+    "headline": "Email Briefing App alpha is live on S3 with unified loading, client-side export, short share links, and admin export history.",
+    "bullets": [
+      "Load Pipeline v2 unifies all load paths (My Designs, local JSON files, and share links) through applyLoadedProject(), with global load state guards.",
+      "Export refactor generates ZIPs client-side and downloads them directly to the user, while Firestore stores only lightweight export metadata.",
+      "Share Link v3 replaces giant base64 URLs with short Firestore-backed #share=<id> links, while keeping legacy #design=<base64> links working for backwards compatibility.",
+      "Admin panel (hidden paver hotspot) surfaces export history from Firestore with date filters for support/debugging.",
+      "Image uploads now use Firebase Storage URLs end-to-end, avoiding oversized Firestore documents and keeping designs sync-safe."
+    ]
+  },
+  "changes": {
+    "code": [
+      "js/app-core.js: global load flags, builder header modes, template loader integration with Load Pipeline v2.",
+      "js/app-save-load.js: centralized applyLoadedProject(), unified load handlers for My Designs, local JSON files, and share links.",
+      "js/app-share-link.js: new short-ID share flow using Firestore 'shares' collection, legacy base64 loader preserved, unified applyShareLinkData().",
+      "js/app-export.js: exportAsExcel() refactored to trigger direct ZIP download and call saveExportMetadata() only.",
+      "js/app-firebase.js: new saveShareSnapshot()/loadShareSnapshot() plus export metadata-only storage and design safety guards.",
+      "js/app-admin.js: admin modal, date range controls, and export history table wired to EmailBriefingDB.getExportLogs().",
+      "js/folders-trash.js: removed export card rendering from My Designs; now only folders and designs appear.",
+      "js/app-ui.js / js/navigation.js: minor wiring to ensure builder screen, buttons, and creative direction section activate correctly."
+    ],
+    "config": [
+      "S3 bucket updated to host latest alpha build with Load Pipeline v2, Export Phase 3, Share Link v3, and Admin Panel.",
+      "Firebase Firestore usage extended with 'exports' (metadata-only) and 'shares' (short link snapshots) collections."
+    ],
+    "data": [
+      "Existing Firestore 'designs' documents remain compatible; new saves enforce image-URL-only constraint and a hard size cap.",
+      "New 'exports' metadata documents created for each ZIP export and visible in the admin history view.",
+      "New 'shares' documents created for each Copy Link operation, storing templateKey, formData, uploadedImages, and projectName."
+    ],
+    "infra": [
+      "App now behaves sensibly under S3 hosting: exports download to the OS Downloads folder, share links round-trip through Firestore, and the admin panel reads export logs from the cloud."
+    ]
+  },
+  "tests": {
+    "manual": [
+      "Ran S3 Alpha Test Script (Load Pipeline + Export + Share Links + Admin) end-to-end.",
+      "Verified creating, saving, and re-loading designs from 'My Designs' cards with correct template selection and form field restoration.",
+      "Verified Education-Drip and other templates load via Templates page, builder shows correct fields, and preview syncs.",
+      "Verified exports generate ZIP files containing Excel brief, PDF preview, and images/ folder, downloading directly to the OS downloads folder.",
+      "Verified Share Link v3 produces short #share=<id> URLs that open the correct design in a fresh browser session.",
+      "Verified legacy #design=<base64> links still load correctly (backwards compatibility).",
+      "Verified Admin panel hotspot reveals export history table populated from Firestore, with working date filters."
+    ],
+    "automated": [
+      "None yet; verification for this snapshot is manual / exploratory."
+    ]
+  },
+  "knownIssues": [
+    "Education-Drip template: pre-built instructional/placeholder copy renders as grey placeholder text unless the marketer edits it, and that grey text does not currently appear in the exported Excel brief. Desired: treat pre-built copy as 'real' text so it always exports unless the marketer deletes it.",
+    "Reloaded designs with uploaded images: image previews appear correctly in the right-hand preview, but the corresponding image drop zones in the form do not currently show the restored thumbnails/state, which can be confusing when editing an existing design.",
+    "Export images folder contents: ZIP images/ folder likely includes both user-uploaded images and certain static/template assets; we should confirm and, if necessary, exclude standard template header art and logos to avoid cluttering the production handoff."
+  ],
+  "risks": [
+    "Firestore 'shares' and 'exports' collections will grow over time; without a cleanup strategy, admin queries and costs could increase.",
+    "Share links rely on Firestore availability; if Firestore is down, legacy #design=<base64> links will still work, but short links will not.",
+    "Client-side ZIP generation depends on browser APIs; older or locked-down environments may experience export failures and need clearer error states."
+  ],
+  "nextSteps": [
+    "Template UX: For Education-Drip, convert pre-built grey instructional copy into real form values that always export, or clearly label non-exportable helper text.",
+    "Image UX: Ensure applySavedImagesToDOM updates the left-hand form drop zones in all load paths so marketers see which image is in each slot when re-opening a design.",
+    "Export hygiene: Decide which static assets (logos, standard header art) should be excluded from the ZIP images/ folder so the production team sees only truly variable assets.",
+    "Admin panel: Wire the 'Open design' button in the export history table to loadDesignFromCard() or a future 'open by designId' helper, so support can jump directly into problematic designs.",
+    "Telemetry & cleanup: Design a simple retention/cleanup strategy for 'exports' and 'shares' collections (e.g., keep 90 days by default) and optional admin tools to prune old records.",
+    "Automated tests: Add a thin layer of browser-based smoke tests that exercise load-from-card, export, share link open, and admin history to catch regressions faster."
+  ],
+  "reason": "Milestone snapshot capturing the first S3-hosted alpha where loading, export, sharing, and admin history all work together end-to-end.",
+  "files": [
+    "index.html",
+    "css/masthead.css",
+    "js/app-core.js",
+    "js/app-save-load.js",
+    "js/app-share-link.js",
+    "js/app-export.js",
+    "js/app-firebase.js",
+    "js/app-admin.js",
+    "js/folders-trash.js",
+    "js/navigation.js",
+    "js/app-ui.js",
+    "js/app-images.js",
+    "js/app-preview.js",
+    "js/app-rich-text.js",
+    "js/app-folder-hierarchy.js",
+    "js/firebase-config.js",
+    "js/templates/templates.js"
+  ]
+}

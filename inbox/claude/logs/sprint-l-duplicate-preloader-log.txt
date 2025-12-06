@@ -1,0 +1,78 @@
+SPRINT L - DUPLICATE PRELOADER IMPLEMENTATION
+=============================================
+Date: 2025-01-09
+Implementer: Claude (MCP Implementation Engineer)
+Task Source: GPT-5.1 (Architect)
+
+OBJECTIVE
+---------
+Add a lightweight inline preloader that appears when duplicating a design.
+No dark overlay - just a small floating card with the Teladoc connector GIF.
+
+IMPLEMENTATION SUMMARY
+---------------------
+1. HTML Changes (index.html)
+   - Added duplicate preloader element after rename modal
+   - Uses same connector GIF as export preloader
+   - Positioned as inline element, not modal overlay
+
+2. CSS Changes (css/components.css)
+   - Added .inline-preloader styles
+   - Bottom-right positioning (24px margins)
+   - White card with rounded corners and shadow
+   - Z-index 1200 (above UI, below modals)
+   - Active state shows/hides with display property
+
+3. JavaScript Changes (js/folders-trash.js)
+   - Added showDuplicatePreloader() helper function
+   - Added hideDuplicatePreloader() helper function
+   - Implemented duplicateDesignFromCard(storageKey, folderId)
+   - Wired into existing context menu
+
+DUPLICATE WORKFLOW
+-----------------
+1. User right-clicks design → selects "Duplicate"
+2. showDuplicatePreloader() displays card immediately
+3. Load original design from database
+4. Create new design with "Copy of" prefix
+5. Save to database with new ID
+6. Add to same folder as original (if applicable)
+7. Brief pause (800ms) for visual feedback
+8. hideDuplicatePreloader() removes card
+9. Refresh My Designs grid to show both designs
+
+ACCEPTANCE CRITERIA
+------------------
+✓ Small card appears at bottom-right when duplicating
+✓ Shows "Duplicating design…" with connector spinner
+✓ NO dark purple overlay (unlike export)
+✓ Card disappears after duplication completes
+✓ Duplicate appears in same folder as original
+✓ Duplicate has "Copy of" prefix in name
+✓ All design data preserved (formData, uploadedImages, etc.)
+✓ Error handling shows notification and hides preloader
+
+FILES MODIFIED
+-------------
+1. /Users/marksexton/Desktop/Email-Briefing-App/index.html
+   - Added duplicate-preloader div before closing body tag
+
+2. /Users/marksexton/Desktop/Email-Briefing-App/css/components.css
+   - Added Sprint L section with inline preloader styles
+
+3. /Users/marksexton/Desktop/Email-Briefing-App/js/folders-trash.js
+   - Added Sprint L comment header
+   - Added preloader helper functions
+   - Added duplicateDesignFromCard() function
+   - Context menu already had Duplicate option wired
+
+TECHNICAL NOTES
+--------------
+- Preloader is truly inline (not modal overlay)
+- Uses same GIF asset as export: teladoc-connector-preloader_1.gif
+- No changes to export preloader behavior
+- Duplicate function preserves ALL design data
+- 800ms artificial delay ensures preloader is visible
+- Error handling uses existing showNotification() if available
+
+STATUS: COMPLETE

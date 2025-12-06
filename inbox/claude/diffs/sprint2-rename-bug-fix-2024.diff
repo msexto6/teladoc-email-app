@@ -1,0 +1,138 @@
+# SPRINT 2 - FIX RENAME BUG (RENAMING CLEARS FORM + PREVIEW)
+# File: js/folders-trash.js
+# Function: renameDesign()
+# Date: 2024
+
+## PROBLEM ANALYSIS
+
+The `renameDesign` function was corrupting design data when renaming because:
+
+1. Firestore stores designs in a wrapper structure:
+   ```javascript
+   {
+     id: "email-project-123...",
+     data: { formData: {...}, uploadedImages: {...}, projectName, template, ... },
+     timestamp: 12345,
+     projectName: "Design Name",
+     template: "standard-template"
+   }
+   ```
+
+2. The old code was:
+   ```javascript
+   const dataStr = await dbGet(itemKey);
+   const design = JSON.parse(dataStr);
+   design.projectName = newName.trim();
+   await dbSave(itemKey, JSON.stringify(design));
+   ```
+
+3. When `dbSave` calls `EmailBriefingDB.saveDesign()`, it creates a NEW wrapper
+   with `{id, data: designData, ...}`. If the input already had a `data` property,
+   the nested data was being lost or overwritten.
+
+## SOLUTION
+
+The fix properly handles the Firestore wrapper structure:
+
+1. Load the full design record
+2. Extract the actual design data from `.data` property (or use raw if not wrapped)
+3. Update ONLY the `projectName` field
+4. Save back using the same structure
+
+## DIFF
+
+```diff
+-async function renameDesign(itemKey) {
+-    const dataStr = await dbGet(itemKey);
+-    if (!dataStr) return;
+-    
+-    const design = JSON.parse(dataStr);
+-    const newName = prompt('Enter new name:', design.projectName);
+-    if (!newName || newName.trim() === '') return;
+-    
+-    design.projectName = newName.trim();
+-    await dbSave(itemKey, JSON.stringify(design));
+-    
+-    // Refresh view
+-    await loadSavedDesigns();
+-}
++/**
++ * SPRINT 2 FIX: Rename design without clearing form data
++ * 
++ * The bug was that renaming was not properly preserving the nested
++ * data structure from Firestore. When Firestore stores a design,
++ * it uses the shape: { id, data: {formData, uploadedImages, ...}, timestamp, projectName, template }
++ * 
++ * This fix:
++ * 1. Loads the FULL design record from the database
++ * 2. Extracts the actual design data from the nested structure
++ * 3. Updates ONLY the projectName field
++ * 4. Preserves ALL other fields (formData, uploadedImages, etc.)
++ * 5. Saves back with the same structure
++ */
++async function renameDesign(itemKey) {
++    console.log('=== renameDesign called ===');
++    console.log('itemKey:', itemKey);
++    
++    // Step 1: Load the FULL design record from the database
++    const dataStr = await dbGet(itemKey);
++    if (!dataStr) {
++        console.error('Design not found:', itemKey);
++        return;
++    }
++    
++    // Step 2: Parse the wrapper object from Firestore
++    const rawData = JSON.parse(dataStr);
++    console.log('Raw data from DB:', rawData);
++    
++    // Step 3: Extract the actual design data (may be nested in 'data' property from Firestore)
++    // The structure from Firestore is: { id, data: {...actualDesignData}, timestamp, projectName, template }
++    const designData = rawData.data || rawData;
++    console.log('Extracted designData:', designData);
++    console.log('  formData keys:', Object.keys(designData.formData || {}));
++    console.log('  uploadedImages keys:', Object.keys(designData.uploadedImages || {}));
++    
++    // Get current project name (could be at top level or in nested data)
++    const currentName = rawData.projectName || designData.projectName || 'Untitled';
++    
++    // Step 4: Prompt for new name
++    const newName = prompt('Enter new name:', currentName);
++    if (!newName || newName.trim() === '') return;
++    
++    const trimmedName = newName.trim();
++    console.log('New name:', trimmedName);
++    
++    // Step 5: Create updated design data - preserving ALL existing fields
++    // Only change the projectName, leave everything else intact
++    const updatedDesignData = {
++        ...designData,
++        projectName: trimmedName
++    };
++    
++    console.log('Updated designData to save:');
++    console.log('  projectName:', updatedDesignData.projectName);
++    console.log('  template:', updatedDesignData.template || updatedDesignData.templateId);
++    console.log('  formData keys:', Object.keys(updatedDesignData.formData || {}));
++    console.log('  uploadedImages keys:', Object.keys(updatedDesignData.uploadedImages || {}));
++    
++    // Step 6: Save back to database
++    // dbSave will handle wrapping for Firestore via EmailBriefingDB.saveDesign
++    await dbSave(itemKey, JSON.stringify(updatedDesignData));
++    
++    console.log('✅ Design renamed successfully');
++    console.log('=== renameDesign completed ===');
++    
++    // Step 7: Refresh the My Designs view
++    await loadSavedDesigns();
++}
+```
+
+## VERIFICATION STEPS
+
+1. Save a design with content: text fields filled, images uploaded
+2. Navigate to My Designs
+3. Right-click a design card → Rename
+4. Enter a new name
+5. Open the renamed design
+6. EXPECTED: All form content and images are still present
+7. EXPECTED: Only the project name has changed

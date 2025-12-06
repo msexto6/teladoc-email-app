@@ -1,0 +1,459 @@
+/* ============================================
+   BUILDER/FORM PANEL STYLES
+   ============================================ */
+
+/* FORM ELEMENTS */
+.email-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-field label {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--color-primary-dark);
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid var(--color-primary-lighter);
+    border-radius: var(--radius-md);
+    font-family: var(--font-primary);
+    font-size: 15px;
+    transition: var(--transition-fast);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Dropdowns */
+.dropdown {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    background-color: var(--color-white);
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%236240E8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 45px !important;
+}
+
+.dropdown-primary {
+    min-width: 300px;
+    padding: 14px 50px 14px 18px !important;
+    border-radius: var(--radius-md);
+    background-position: right 20px center;
+}
+
+/* Dropdown options hover */
+.dropdown option:hover {
+    background-color: var(--color-primary) !important;
+    color: var(--color-white) !important;
+}
+
+/* Creative Direction Section */
+.creative-section {
+    display: none;
+    margin-bottom: var(--spacing-lg);
+}
+
+.creative-section.active {
+    display: block;
+}
+
+/* TEXT FORMATTING TOOLBAR */
+.formatting-toolbar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: var(--color-primary-lightest);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--color-primary-lighter);
+}
+
+.format-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-white);
+    border: 1px solid var(--color-primary-lighter);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 1.05em;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    transition: var(--transition-fast);
+}
+
+.format-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+    transform: scale(1.05);
+}
+
+.format-btn:active {
+    transform: scale(0.95);
+}
+
+/* RICH TEXT EDITOR */
+.rich-text-editor {
+    min-height: 150px;
+    max-height: 400px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.rich-text-editor:empty:before {
+    content: attr(data-placeholder);
+    color: #999;
+}
+
+.rich-text-editor:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.rich-text-editor strong {
+    font-weight: 700;
+}
+
+.rich-text-editor em {
+    font-style: italic;
+}
+
+.rich-text-editor u {
+    text-decoration: underline;
+}
+
+.rich-text-editor a {
+    color: #00B5E2;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.rich-text-editor a:hover {
+    color: var(--color-primary);
+}
+
+.rich-text-editor br {
+    display: block;
+    content: '';
+    margin: 0.5em 0;
+}
+
+.rich-text-editor p {
+    margin-bottom: 0.5em;
+}
+
+/* Rich text editor list styling */
+.rich-text-editor ul {
+    margin: 1em 0;
+    padding-left: 40px;
+}
+
+.rich-text-editor ul li {
+    margin-bottom: 0.5em;
+    line-height: 1.6;
+}
+
+/* IMAGE UPLOAD ZONE */
+.image-drop-zone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 20px;
+    text-align: center;
+    background: var(--color-primary-lightest);
+    min-height: 80px;
+    border: 3px dashed var(--color-primary-light);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.image-drop-zone:hover {
+    background: #EDE9F6;
+    border-color: var(--color-primary);
+}
+
+.image-drop-zone.drag-active {
+    background: #EDE9F6;
+    border-color: var(--color-primary);
+}
+
+.drop-zone-icon {
+    width: 80px;
+    height: 80px;
+    stroke: var(--color-primary-light);
+    stroke-width: 2;
+    margin-bottom: 10px;
+}
+
+.drop-zone-text {
+    color: var(--color-primary-dark);
+    font-size: 1.05em;
+    margin-top: 0;
+}
+
+.image-preview-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 280px;
+    border-radius: var(--radius-md);
+}
+
+.image-remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background: var(--color-danger);
+    color: var(--color-white);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+    transition: var(--transition-fast);
+}
+
+.image-remove-btn:hover {
+    transform: scale(1.1);
+    background: #DC2626;
+}
+
+/* SPRINT: Image hover hint for filled dropzones */
+.image-hover-hint {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 12px;
+    background: linear-gradient(transparent, rgba(53, 31, 101, 0.85));
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.image-drop-zone.has-image:hover .image-hover-hint {
+    opacity: 1;
+}
+
+/* Ensure proper styling when dropzone has an image */
+.image-drop-zone.has-image {
+    padding: 15px;
+    border-style: solid;
+    border-color: var(--color-primary-lighter);
+    background: var(--color-white);
+}
+
+.image-drop-zone.has-image:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-lightest);
+}
+
+/* CHARACTER COUNTER */
+.char-counter {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+}
+
+.char-count {
+    font-size: 13px;
+    color: var(--color-primary);
+    font-weight: 700;
+    min-width: 80px;
+}
+
+.char-count.over-limit {
+    color: var(--color-danger-accent);
+}
+
+.char-progress-bar {
+    flex: 1;
+    height: 12px;
+    border: 2px solid var(--color-primary-lighter);
+    border-radius: 6px;
+    overflow: hidden;
+    background: transparent;
+}
+
+.char-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width var(--transition-fast), background-color var(--transition-fast);
+}
+
+.char-progress-fill.safe {
+    background: var(--color-success);
+}
+
+.char-progress-fill.warning {
+    background: var(--color-warning);
+}
+
+.char-progress-fill.danger {
+    background: var(--color-danger);
+}
+
+/* ACTION BUTTONS - PHASE 3 TASK F FIX */
+.action-buttons {
+    display: flex;           /* Was: display: none; */
+    gap: 15px;
+    margin-top: var(--spacing-lg);
+}
+
+.action-buttons.active {
+    display: flex;
+}
+
+/* Image drop zone - Selected and Focused states */
+.image-drop-zone.selected,
+.image-drop-zone.focused {
+    border-color: var(--color-primary);
+    border-style: solid;
+    background: #EDE9F6;
+    box-shadow: 0 0 0 3px rgba(98, 64, 232, 0.15);
+}
+
+.image-drop-zone.selected .drop-zone-text::after {
+    content: ' (Ready to paste)';
+    font-size: 0.85em;
+    color: var(--color-primary);
+    font-style: italic;
+}
+
+/* ============================================
+   ACCORDION GROUPS - SPRINT: ACCORDION
+   ============================================ */
+
+/* Accordion wrapper - NO border, just container */
+.form-accordion {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* 30px spacing between accordion items */
+}
+
+/* Individual accordion items - each gets its own plum border */
+.accordion-item {
+    border: none; /* Plum border */
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+/* Accordion header button - Plum background with white text and chevron arrow */
+.accordion-header {
+    position: relative;
+    width: 100%;
+    text-align: left;
+    padding: 14px 50px 14px 16px; /* Extra right padding for arrow */
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    background: var(--color-primary-dark); /* Plum background */
+    color: var(--color-white); /* White text */
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    font-family: var(--font-primary);
+    /* Add the same chevron arrow as dropdowns */
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+}
+
+.accordion-header:hover {
+    background-color: #2A1952; /* Slightly darker plum on hover */
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Rotate arrow when expanded */
+.accordion-header[aria-expanded="true"] {
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 12.5L10 7.5L15 12.5' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Accordion body (collapsible content) */
+.accordion-body {
+    padding: 12px 16px 16px;
+    background: #ffffff;
+}
+
+/* Ensure form fields inside accordion body maintain proper spacing */
+.accordion-body .form-field {
+    margin-bottom: 20px;
+}
+
+.accordion-body .form-field:last-child {
+    margin-bottom: 0;
+}
+
+/* Feature section headers (Feature 1, Feature 2) */
+.feature-section-header {
+    font-family: 'Dalton Maag Effra Bold', Arial, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    margin-top: 24px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-primary-lighter);
+}
+
+.feature-section-header:first-child {
+    margin-top: 0;
+}
+
+/* PHASE 2 TASK 0: Force template selector visibility */
+.template-selector,
+#template-selector,
+#template-select,
+#template-select-container {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#template-selector {
+    display: block !important;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}

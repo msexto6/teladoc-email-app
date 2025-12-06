@@ -1,0 +1,80 @@
+EXPORT MODAL FONT FIX - EFFRA CONSISTENCY
+==========================================
+
+Date: Sunday, November 30, 2025
+Issue: Export modal preloader showing Arial instead of Effra
+Status: FIXED ✅
+
+PROBLEM
+-------
+The export modal (specifically the preloader overlay) was displaying a mix of Arial and Effra fonts. The user wanted all text - both regular and bold - to use Effra consistently across the board.
+
+ROOT CAUSE
+----------
+In css/modals.css, the .modal-content class was using the system font stack:
+```css
+font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+```
+
+This caused:
+- All modal text to default to system fonts (Arial on Windows, SF Pro on Mac)
+- Only elements that explicitly specified var(--font-primary) would use Effra
+- Inconsistent font rendering across the modal
+
+SOLUTION
+--------
+Updated css/modals.css:
+
+1. Fixed .modal-content (line 25):
+   BEFORE: font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+   AFTER:  font-family: var(--font-primary);
+
+2. Enhanced .modal-title (line 36):
+   BEFORE: font-weight: 600;
+   AFTER:  font-family: var(--font-primary-bold);
+           font-weight: 600;
+
+AFFECTED ELEMENTS
+-----------------
+Now using Effra across ALL modals:
+✅ Export preloader title ("Building your export package…")
+✅ Export success title ("Success!")
+✅ Export modal body text
+✅ Delete confirmation modal
+✅ Rename modal
+✅ Save/Save As modals
+✅ Folder creation modal
+✅ All modal buttons (already had var(--font-primary))
+
+FONT HIERARCHY
+--------------
+- Modal content: Effra Regular (400)
+- Modal titles: Effra Bold (via var(--font-primary-bold))
+- Modal buttons: Effra Regular (400)
+- Modal body text: Effra Regular (inherited)
+
+IMPLEMENTATION
+--------------
+Used sed commands for quick CSS updates:
+1. Replaced system font stack with var(--font-primary)
+2. Added explicit bold font declaration to modal titles
+
+FILES MODIFIED
+--------------
+- css/modals.css
+  * Line 25: .modal-content font-family
+  * Line 36: .modal-title font-family
+
+TESTING
+-------
+Test the export flow:
+1. Open any design in builder
+2. Click Export button
+3. Verify "Building your export package…" uses Effra Bold
+4. Verify success message uses Effra Bold
+5. Verify body text uses Effra Regular
+6. Check all other modals for consistency
+
+RESULT
+------
+All modal text now consistently uses Effra font family with proper weight variants. No more Arial mixed in anywhere.

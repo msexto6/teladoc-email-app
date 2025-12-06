@@ -1,0 +1,312 @@
+PHASE 2 – TASK C: FIX PREVIEW RENDERING AND TEMPLATE TITLE
+================================================================
+
+Timestamp: 2025-11-22 18:38:29
+Task ID: phase2-taskC
+Files Modified: 2
+
+FILE 1: js/app-core.js
+======================
+
+CHANGE 1: Synced lexical and window globals for template state (TASK C1)
+
+BEFORE (lines ~133-138):
+```javascript
+    // Set global state
+    window.currentTemplateKey = key;
+    window.currentTemplate = templateDefinition;
+    
+    // Reset all in-memory state
+    window.formData = {};
+    window.uploadedImages = {};
+    console.log("🔄 State reset: formData and uploadedImages cleared");
+```
+
+AFTER (lines ~133-144):
+```javascript
+    // --- Global state sync (critical) ---
+    // TASK C1: Sync both lexical and window globals so preview can access them
+    currentTemplateKey = key;
+    currentTemplate = templateDefinition;
+    
+    // Also mirror to window for debugging / external tools
+    window.currentTemplateKey = currentTemplateKey;
+    window.currentTemplate = currentTemplate;
+    
+    // Reset all in-memory state
+    formData = {};
+    uploadedImages = {};
+    window.formData = formData;
+    window.uploadedImages = uploadedImages;
+    console.log("🔄 State reset: formData and uploadedImages cleared");
+```
+
+RATIONALE:
+- app-preview.js reads lexical currentTemplate and currentTemplateKey variables
+- Previously only window.currentTemplate* were set
+- This caused preview to think no template was active
+- Now both lexical AND window variables are synchronized
+- Preview can access currentTemplate successfully
+- Also synced formData and uploadedImages for consistency
+
+
+CHANGE 2: Added updateBuilderTemplateTitle helper function (TASK C3)
+
+ADDED (lines ~187-210):
+```javascript
+// PHASE 2 TASK C3: Update builder template title header
+function updateBuilderTemplateTitle(templateKey, templateDefinition) {
+    try {
+        const titleEl = document.getElementById('builder-template-title');
+        if (!titleEl) return;
+
+        // Prefer explicit definition, then global templates map
+        let name = null;
+
+        if (templateDefinition && templateDefinition.name) {
+            name = templateDefinition.name;
+        } else if (window.templates && templateKey && window.templates[templateKey]) {
+            name = window.templates[templateKey].name;
+        } else if (templateKey) {
+            // Fallback: humanize the key if no formal name
+            name = templateKey.replace(/-/g, ' ');
+        }
+
+        titleEl.textContent = name || 'Your Content';
+    } catch (err) {
+        console.error('⚠️ Failed to update builder template title', err);
+    }
+}
+```
+
+RATIONALE:
+- Sets the big H1 header with template name (e.g., "Partner Essentials NL")
+- Cascading resolution: templateDefinition.name → templates[key].name → humanized key
+- Graceful fallback to "Your Content" if nothing resolves
+- Try-catch prevents errors from breaking template loading
+- Makes UI clearer about which template is active
+
+
+CHANGE 3: Call updateBuilderTemplateTitle in loadTemplateByKey (TASK C3)
+
+ADDED (line ~146):
+```javascript
+    // TASK C3: Update builder template title
+    updateBuilderTemplateTitle(key, templateDefinition);
+```
+
+RATIONALE:
+- Called after state sync but before form generation
+- Ensures title updates before user sees the form
+- Placed in correct sequence for UI consistency
+
+
+FILE 2: js/app-preview.js
+=========================
+
+CHANGE: Made updatePreview robust with fallback to synced globals (TASK C2)
+
+BEFORE (lines ~1-8):
+```javascript
+function updatePreview() {
+    const content = document.getElementById("preview-content");
+    if(!currentTemplate) {
+        content.innerHTML = '<p style="text-align:center;padding:80px 20px;color:#9B8FC7;">Select a template to see preview</p>';
+        return;
+    }
+    
+    const templateKey = Object.keys(templates).find(key => templates[key] === currentTemplate);
+```
+
+AFTER (lines ~1-22):
+```javascript
+// PHASE 2 TASK C2: Updated to use synced lexical globals with fallbacks
+function updatePreview() {
+    const content = document.getElementById("preview-content");
+    if (!content) return;
+
+    // Prefer lexical globals, but fall back to window in case something external sets them
+    const activeTemplate = currentTemplate || window.currentTemplate || null;
+    const activeTemplateKey = currentTemplateKey || window.currentTemplateKey || null;
+
+    // Define placeholder HTML
+    const PREVIEW_PLACEHOLDER_HTML = '<p style="text-align:center;padding:80px 20px;color:#9B8FC7;">Select a template to see preview</p>';
+
+    if (!activeTemplate) {
+        content.innerHTML = PREVIEW_PLACEHOLDER_HTML;
+        return;
+    }
+    
+    // Resolve template key - prefer activeTemplateKey, fallback to lookup
+    let templateKey = activeTemplateKey;
+    if (!templateKey && activeTemplate) {
+        templateKey = Object.keys(templates).find(key => templates[key] === activeTemplate);
+    }
+```
+
+RATIONALE:
+- Prefers lexical currentTemplate and currentTemplateKey (now synced by Task C1)
+- Falls back to window.currentTemplate* for external/legacy compatibility
+- Defines activeTemplate and activeTemplateKey for clear naming
+- Uses activeTemplateKey directly instead of expensive Object.keys lookup
+- Only does lookup if activeTemplateKey is missing
+- More defensive: checks if content exists before proceeding
+- Defines PREVIEW_PLACEHOLDER_HTML as constant for reusability
+
+
+EXPECTED RESULTS:
+=================
+
+1. **Template Selection from Menu:**
+   - Click Templates → Partner Essentials NL
+   - Builder header shows: "Partner Essentials NL" (not blank)
+   - Form generates in left panel
+   - Preview renders correctly in right panel (not placeholder)
+   - Console shows successful state sync
+
+2. **Preview Rendering:**
+   - Preview actually displays template content
+   - No longer shows "Select a template to see preview"
+   - Correct template renderer function is called
+   - All links open in new tab
+
+3. **Global State Consistency:**
+   - Both currentTemplate and window.currentTemplate are set
+   - Both currentTemplateKey and window.currentTemplateKey are set
+   - Preview can access lexical variables successfully
+   - External code can still use window.* for compatibility
+
+4. **Title Display:**
+   - Header shows human-readable template name
+   - Fallback works if template has no name property
+   - Never crashes even if template data is malformed
+
+
+TESTING STEPS:
+==============
+
+**Test 1: Fresh Template Load**
+1. Reload index.html in Chrome
+2. Open Developer Console
+3. Click Templates → Education Drip - HP
+4. Verify:
+   - Header shows "Education Drip - HP" (or similar readable name)
+   - Form fields appear in left panel
+   - Preview renders template content (not placeholder)
+   - Console shows state sync logs
+
+**Test 2: Different Templates**
+1. Click Templates → Partner Essentials NL
+2. Verify header updates to "Partner Essentials NL"
+3. Verify preview renders Partner Essentials content
+4. Switch to another template
+5. Verify header and preview both update
+
+**Test 3: Global State**
+1. Open Console
+2. Run: `console.log({currentTemplate, currentTemplateKey, 'window.currentTemplate': window.currentTemplate, 'window.currentTemplateKey': window.currentTemplateKey})`
+3. Verify all four values are defined and consistent
+
+**Test 4: Preview Robustness**
+1. Open Console
+2. Run: `currentTemplate = null; window.updatePreview();`
+3. Verify preview shows placeholder (doesn't crash)
+4. Reload page and select template again
+5. Verify preview renders correctly
+
+
+TECHNICAL NOTES:
+================
+
+**Why Preview Was Broken:**
+
+The preview system reads `currentTemplate` and `currentTemplateKey` as lexical variables from the module scope. However, `loadTemplateByKey` was only setting `window.currentTemplate` and `window.currentTemplateKey`, not the lexical variables. This meant:
+
+1. Preview checked `if (!currentTemplate)` and found it was `null`
+2. Preview showed placeholder instead of rendering
+3. Form generation worked because it used window.* references
+
+**How This Fix Solves It:**
+
+1. **Task C1:** Syncs BOTH lexical and window variables
+   ```javascript
+   currentTemplateKey = key;              // ← lexical (for app-preview.js)
+   currentTemplate = templateDefinition;   // ← lexical (for app-preview.js)
+   window.currentTemplateKey = key;       // ← window (for debugging/external)
+   window.currentTemplate = templateDefinition; // ← window (for debugging/external)
+   ```
+
+2. **Task C2:** Makes preview robust with fallbacks
+   ```javascript
+   const activeTemplate = currentTemplate || window.currentTemplate || null;
+   const activeTemplateKey = currentTemplateKey || window.currentTemplateKey || null;
+   ```
+   Now preview works whether lexical OR window variables are set
+
+3. **Task C3:** Updates title so user sees which template is active
+   - Visual confirmation that template loaded
+   - Matches template name from menu selection
+
+
+**Key Design Decisions:**
+
+1. **Dual Synchronization:** Both lexical and window variables updated for maximum compatibility
+2. **Cascading Fallbacks:** Preview tries lexical first, then window, then null
+3. **Direct Key Usage:** activeTemplateKey used directly instead of expensive lookup
+4. **Error Prevention:** Try-catch in title update prevents crashes
+5. **Sequence Matters:** Title updated after state sync but before form generation
+
+
+DEPENDENCIES:
+=============
+
+This fix assumes:
+- window.templates exists with template definitions
+- Each template has a .name property (with fallback if missing)
+- DOM element with id="builder-template-title" exists
+- DOM element with id="preview-content" exists
+- Template renderer functions exist (renderEducationDripHpPreview, etc.)
+
+No new dependencies introduced.
+
+
+FILES UNCHANGED:
+================
+
+- js/app-form.js: No changes needed
+- js/app-save-load.js: No changes needed
+- js/templates.js: No changes needed
+- Template renderer files: No changes needed
+- All other files: No changes needed
+
+Only app-core.js and app-preview.js were modified.
+
+
+INTEGRATION WITH PREVIOUS TASKS:
+=================================
+
+**Task A (Syntax Error + Diagnostics):**
+- Fixed syntax errors that prevented app from loading
+- Added diagnostics to loadTemplateByKey
+
+**Task B (generateForm Robustness):**
+- Made generateForm accept template parameters
+- Added validation and error handling
+
+**Task C (This Task - Preview + Title):**
+- Syncs state so preview can access template
+- Updates title so user sees which template is active
+- Makes preview robust with fallback logic
+
+All three tasks work together to create a reliable template loading system:
+1. Task A: Template loads successfully with diagnostics
+2. Task B: Form generates with validated template
+3. Task C: Preview renders and title displays ← THIS TASK
+
+The system now has:
+✅ No syntax errors
+✅ Comprehensive diagnostics
+✅ Validated form generation
+✅ Working preview rendering
+✅ Visible template title
+✅ Consistent global state

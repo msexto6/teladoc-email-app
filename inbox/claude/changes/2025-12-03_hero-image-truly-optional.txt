@@ -1,0 +1,100 @@
+EMAIL BRIEFING APP - CHANGE LOG
+================================
+Date: December 3, 2025
+Task: Make hero-image truly optional (independent of toggle state)
+Status: COMPLETE
+
+REQUIREMENT
+-----------
+User requested that hero-image be optional even when the show-hero toggle is ON.
+Previously, the validation logic would require hero-image when toggle was true.
+Now, hero-image should never block exports regardless of toggle state.
+
+CHANGES MADE
+------------
+
+1. FILE: /Users/marksexton/Desktop/Email-Briefing-App/js/templates.js
+   
+   MODIFICATION: Removed "hero-image" from Standard Template validation
+   
+   BEFORE:
+   "validation": {
+       "requiredFields": ["hero-image", "headline", "body-copy", "cta", "cta-url"]
+   }
+   
+   AFTER:
+   "validation": {
+       "requiredFields": ["headline", "body-copy", "cta", "cta-url"]
+   }
+   
+   REASON: By removing hero-image from requiredFields, validation no longer
+   blocks exports when hero-image is missing, regardless of toggle state.
+
+2. ADDED DOCUMENTATION NOTE to templates.js header:
+   "DEC 2025: Made hero-image optional in Standard Template (removed from requiredFields)"
+
+VALIDATION LOGIC (UNCHANGED BUT RELEVANT)
+------------------------------------------
+
+The conditional validation code in app-form.js remains in place:
+
+```javascript
+// DEC 2025: Skip hero-image validation if toggle is off
+if (fieldId === 'hero-image' && !heroToggleEnabled) {
+    console.log("⏭ Skipping hero-image validation (toggle is off)");
+    return;
+}
+```
+
+This code is now effectively redundant since hero-image is not in requiredFields,
+but keeping it provides backward compatibility if hero-image is ever manually
+added back to the required fields list.
+
+BEHAVIOR SUMMARY
+----------------
+
+BEFORE THIS CHANGE:
+- Toggle ON + hero missing = Export BLOCKED
+- Toggle OFF + hero missing = Export ALLOWED
+
+AFTER THIS CHANGE:
+- Toggle ON + hero missing = Export ALLOWED ✓
+- Toggle OFF + hero missing = Export ALLOWED ✓
+- Hero-image is now completely optional regardless of toggle state
+
+PREVIEW BEHAVIOR (UNCHANGED):
+- Toggle ON + hero uploaded = Shows hero image in preview
+- Toggle ON + hero missing = Shows placeholder in preview
+- Toggle OFF = No hero section in preview (regardless of hero upload status)
+
+TESTING CHECKLIST
+-----------------
+[ ] Open Standard Template in browser
+[ ] Toggle ON, no hero image → click Export → should succeed
+[ ] Toggle OFF, no hero image → click Export → should succeed
+[ ] Toggle ON, with hero image → preview shows hero
+[ ] Toggle OFF, with hero image → preview hides hero
+[ ] Save and reload design → toggle state preserved correctly
+
+FILES MODIFIED
+--------------
+1. /Users/marksexton/Desktop/Email-Briefing-App/js/templates.js
+   - Removed "hero-image" from requiredFields array
+   - Added documentation comment
+
+BACKWARD COMPATIBILITY
+----------------------
+✓ Existing designs will continue to work
+✓ Old designs without show-hero field default to hero visible
+✓ Validation system gracefully handles missing fields
+✓ No breaking changes to data structures
+
+TECHNICAL NOTES
+---------------
+- Hero-image is still defined in the fields array (for UI generation)
+- Hero-image still has an upload zone in the form
+- Hero-image still triggers preview updates when uploaded
+- Only the VALIDATION requirement has been removed
+- The toggle field controls PREVIEW visibility, not validation
+
+END OF CHANGE LOG

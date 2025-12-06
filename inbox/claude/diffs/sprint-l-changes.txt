@@ -1,0 +1,202 @@
+SPRINT L - DUPLICATE PRELOADER IMPLEMENTATION DIFF
+==================================================
+Date: 2025-01-09
+Implementer: Claude (MCP)
+
+FILE 1: index.html
+==================
+LOCATION: Before closing </body> tag, after rename modal
+CHANGE: Added duplicate preloader HTML element
+
++++ ADDED:
+    <!-- Duplicate Preloader (inline, no overlay) - Sprint L -->
+    <div id="duplicate-preloader" class="inline-preloader" aria-hidden="true">
+        <div class="inline-preloader-content">
+            <img
+                src="assets/images/teladoc-connector-preloader_1.gif"
+                alt="Duplicating design…"
+                class="inline-preloader-spinner"
+            />
+            <div class="inline-preloader-text">Duplicating design…</div>
+        </div>
+    </div>
+
+FILE 2: css/components.css
+===========================
+LOCATION: End of file, after Sprint K section
+CHANGE: Added inline preloader styles
+
++++ ADDED:
+/* ============================================
+   SPRINT L: DUPLICATE PRELOADER (INLINE)
+   ============================================ */
+
+.inline-preloader {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: none;
+    z-index: 1200; /* above main UI, below modals */
+}
+
+.inline-preloader.active {
+    display: block;
+}
+
+.inline-preloader-content {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: 0 10px 30px rgba(5, 0, 30, 0.35);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.inline-preloader-spinner {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.inline-preloader-text {
+    font-size: 14px;
+    color: #351F65;
+    white-space: nowrap;
+}
+
+FILE 3: js/folders-trash.js
+============================
+LOCATION: After variable declarations, before FIREBASE HELPER FUNCTIONS
+CHANGE: Added Sprint L duplicate functionality
+
++++ HEADER UPDATED:
+ * SPRINT 3: Added Duplicate functionality for design cards
+ * SPRINT J: Added Teladoc-style Rename modal
++ * SPRINT L: Added Duplicate Preloader (inline, no overlay)
+
++++ ADDED SECTION (lines ~25-95):
+// ============================================
+// SPRINT L: DUPLICATE PRELOADER FUNCTIONS
+// ============================================
+
+/**
+ * Show the inline duplicate preloader
+ * (Small floating card at bottom-right of screen)
+ */
+function showDuplicatePreloader() {
+    const el = document.getElementById('duplicate-preloader');
+    if (!el) return;
+    el.classList.add('active');
+    el.setAttribute('aria-hidden', 'false');
+}
+
+/**
+ * Hide the inline duplicate preloader
+ */
+function hideDuplicatePreloader() {
+    const el = document.getElementById('duplicate-preloader');
+    if (!el) return;
+    el.classList.remove('active');
+    el.setAttribute('aria-hidden', 'true');
+}
+
+// ============================================
+// SPRINT L: DUPLICATE DESIGN FUNCTIONALITY
+// ============================================
+
+/**
+ * Duplicate a design from a card in My Designs
+ * Called from the context menu
+ * 
+ * @param {string} storageKey - The design ID to duplicate
+ * @param {string} folderId - The folder ID where design is located (or empty string for root)
+ */
+async function duplicateDesignFromCard(storageKey, folderId) {
+    console.log('=== duplicateDesignFromCard ===');
+    console.log('storageKey:', storageKey);
+    console.log('folderId:', folderId || '(root)');
+    
+    try {
+        // Show preloader immediately
+        showDuplicatePreloader();
+        
+        // Step 1: Load the FULL design record from the database
+        const dataStr = await dbGet(storageKey);
+        if (!dataStr) {
+            console.error('Design not found:', storageKey);
+            hideDuplicatePreloader();
+            if (typeof showNotification === 'function') {
+                showNotification('Could not duplicate design. Please try again.', 'error', { scope: 'duplicate' });
+            }
+            return;
+        }
+        
+        // Step 2: Parse the wrapper object from Firestore
+        const rawData = JSON.parse(dataStr);
+        
+        // Step 3: Extract the actual design data
+        const originalDesignData = rawData.data || rawData;
+        
+        // Step 4: Create a new design record with a new key
+        const newStorageKey = 'email-design-' + Date.now();
+        
+        // Step 5: Clone the design data with a new name
+        const originalName = originalDesignData.projectName || 'Untitled';
+        const newName = 'Copy of ' + originalName;
+        
+        const newDesignData = {
+            ...originalDesignData,
+            projectName: newName,
+            createdDate: new Date().toISOString(),
+            lastModified: new Date().toISOString()
+        };
+        
+        console.log('Creating duplicate:');
+        console.log('  Original key:', storageKey);
+        console.log('  New key:', newStorageKey);
+        console.log('  Original name:', originalName);
+        console.log('  New name:', newName);
+        
+        // Step 6: Save the new design to the database
+        await dbSave(newStorageKey, JSON.stringify(newDesignData));
+        
+        // Step 7: If the original design is in a folder, add the duplicate to the same folder
+        if (folderId && folderId !== '') {
+            await addItemToFolder(folderId, newStorageKey);
+        }
+        
+        // Step 8: Simulate a brief pause to show the preloader (makes it feel more intentional)
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Step 9: Hide preloader
+        hideDuplicatePreloader();
+        
+        // Step 10: Refresh My Designs grid
+        await loadSavedDesigns();
+        
+        console.log('✅ Design duplicated successfully');
+        
+    } catch (err) {
+        console.error('Duplicate failed:', err);
+        hideDuplicatePreloader();
+        if (typeof showNotification === 'function') {
+            showNotification('Could not duplicate design. Please try again.', 'error', { scope: 'duplicate' });
+        }
+    }
+}
+
+INTEGRATION NOTES:
+- Context menu already had "Duplicate" option wired to duplicateDesignFromCard()
+- No changes needed to context menu HTML generation
+- Function was referenced but not defined - now implemented
+
+SUMMARY
+=======
+Total files modified: 3
+Total lines added: ~150
+Total lines removed: 0
+Architecture changes: None (follows existing patterns)
+Data structure changes: None (preserves all design data)
+Breaking changes: None

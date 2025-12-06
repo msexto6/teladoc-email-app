@@ -1,0 +1,173 @@
+PHASE 3 EXPORT REFACTOR - CODE DIFFS
+====================================
+
+FILE: js/app-export.js
+----------------------
+
+ADDED: triggerDownload() helper function (line ~35)
+```javascript
+function triggerDownload(blob, fileName) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    console.log(`✅ Download triggered: ${fileName} (${blob.size} bytes)`);
+}
+```
+
+MODIFIED: exportAsExcel() - Removed IndexedDB/FileReader logic
+OLD (lines ~350-400):
+```javascript
+const reader = new FileReader();
+reader.onloadend = async function () {
+    const base64data = reader.result;
+    const exportKey = 'email-export-' + Date.now();
+    
+    const exportData = {
+        projectName: projectName + ".zip",
+        exportType: "zip",
+        fileData: base64data,
+        // ...more fields
+    };
+    
+    await dbSave(exportKey, JSON.stringify(exportData));
+    // ...rest of save logic
+};
+reader.readAsDataURL(zipBlob);
+```
+
+NEW (lines ~245-280):
+```javascript
+// Generate ZIP
+const zipBlob = await zip.generateAsync({ type: "blob" });
+console.log("Export: ZIP blob size (bytes):", zipBlob.size);
+console.log("Export: triggering download:", exportFileName);
+
+// Trigger client-side download
+triggerDownload(zipBlob, exportFileName);
+
+// Save metadata to Firestore (optional)
+try {
+    if (typeof EmailBriefingDB !== 'undefined' && EmailBriefingDB.saveExportMetadata) {
+        await EmailBriefingDB.saveExportMetadata({
+            designId: window.currentLocalStorageKey || null,
+            designName: projectName,
+            templateKey: window.currentTemplateKey || currentTemplate.key,
+            sizeBytes: zipBlob.size,
+            createdAt: Date.now(),
+            fileName: exportFileName
+        });
+        console.log("✅ Export metadata saved to Firestore");
+    }
+} catch (metadataError) {
+    console.warn("Export file created, but metadata could not be saved:", metadataError);
+    showToast("Export downloaded. History entry could not be saved, but your ZIP file is fine.");
+}
+```
+
+MODIFIED: Error messages
+REMOVED:
+- "Export too large to save"
+- "images must be URLs"
+- References to Firestore size limits
+
+ADDED:
+- "We couldn't generate your export file"
+- "Export downloaded. History entry could not be saved, but your ZIP file is fine."
+
+
+FILE: js/app-firebase.js
+-------------------------
+
+ADDED: saveExportMetadata() function (line ~102)
+```javascript
+async saveExportMetadata(exportMeta) {
+    await this.waitForFirebase();
+    try {
+        const exportDoc = {
+            designId: exportMeta.designId || null,
+            designName: exportMeta.designName || 'Untitled',
+            templateKey: exportMeta.templateKey || null,
+            sizeBytes: exportMeta.sizeBytes || null,
+            fileName: exportMeta.fileName || null,
+            createdAt: exportMeta.createdAt || Date.now(),
+            timestamp: Date.now()
+        };
+        
+        const exportId = 'export-meta-' + Date.now();
+        await db.collection('exports').doc(exportId).set(exportDoc);
+        console.log('Export metadata saved:', exportDoc);
+        return true;
+    } catch (error) {
+        console.error('✗ Failed to save export metadata:', error);
+        throw error;
+    }
+}
+```
+
+MODIFIED: saveExport() to legacy wrapper (line ~131)
+OLD:
+```javascript
+async saveExport(id, data) {
+    // ... process export data
+    // ... check size limits
+    // ... save full document with fileData
+}
+```
+
+NEW:
+```javascript
+async saveExport(id, data) {
+    console.warn('saveExport (legacy) called - redirecting to metadata-only save');
+    
+    const exportMeta = {
+        designId: data.sourceProject || id,
+        designName: data.projectName || 'Untitled',
+        templateKey: data.template || null,
+        sizeBytes: data.fileData ? data.fileData.length : null,
+        fileName: data.fileName || data.projectName || 'export.zip',
+        createdAt: Date.now()
+    };
+    
+    return await this.saveExportMetadata(exportMeta);
+}
+```
+
+REMOVED: Size checking logic
+```javascript
+// DELETED:
+const documentSize = JSON.stringify(documentToSave).length;
+if (documentSize > 950000) {
+    console.warn(`Export too large (${documentSize} bytes) — images must be URLs.`);
+    alert("Export too large to save...");
+    return false;
+}
+```
+
+
+KEY DIFFERENCES SUMMARY
+========================
+
+1. Export Flow:
+   BEFORE: Generate ZIP → Convert to Base64 → Save to IndexedDB/Firestore → Show success
+   AFTER:  Generate ZIP → Trigger download → Save metadata → Show success
+
+2. Data Storage:
+   BEFORE: Full ZIP as base64 string (~500KB-2MB per export)
+   AFTER:  Metadata only (~0.5KB per export)
+
+3. User Experience:
+   BEFORE: "Export saved to My Designs" (but often "too large" errors)
+   AFTER:  "Export complete!" (downloads immediately, no size errors)
+
+4. Error Handling:
+   BEFORE: Confusing messages about Firestore limits and image URLs
+   AFTER:  Clear distinction between export failure vs. metadata save failure
+
+5. Re-download Capability:
+   BEFORE: Exports stored in My Designs, can re-download anytime
+   AFTER:  Exports download once during creation, metadata shows history only

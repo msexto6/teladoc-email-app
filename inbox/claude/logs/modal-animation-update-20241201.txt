@@ -1,0 +1,27 @@
+Implementation Log: Modal GSAP Animation Update
+================================================
+Timestamp: 2024-12-01
+Engineer: Claude MCP
+Status: ✓ Complete
+
+TASK SUMMARY:
+Update modal dialog animations to use scale-only motion without vertical sliding.
+
+FILES MODIFIED:
+- js/ui-animations.js
+
+CHANGES:
+1. animateModalOpen(): Changed scale from 0.97 → 0.80, removed y: 16 movement
+2. animateModalClose(): Changed scale from 0.97 → 0.80, removed y: 10 movement
+
+RESULT:
+All modals now use centered scale animation (0.80 ↔ 1.00) with no vertical motion.
+Overlay fade animations preserved.
+
+TESTING REQUIRED:
+- Open any modal (Save, Load, New Design, Settings)
+- Verify smooth scale-only animation
+- Verify no vertical sliding
+- Verify proper fade behavior
+
+Next: Test in browser by opening modals.

@@ -1,0 +1,67 @@
+PHASE 3 EXPORT REFACTOR - COMPLETE
+===================================
+
+Status: ✅ IMPLEMENTED
+Date: 2025-11-23
+Engineer: Claude (MCP)
+
+WHAT CHANGED
+============
+
+Export System Behavior:
+- Exports now download immediately to user's Downloads folder
+- ZIP files are ephemeral (created once, not stored)
+- Firestore only stores lightweight metadata (~0.5KB per export)
+- No more "Export too large" or "images must be URLs" errors
+
+Files Modified:
+1. js/app-export.js
+   - Added triggerDownload() helper
+   - Refactored exportAsExcel() for client-side download
+   - Updated error messages
+   - Modified legacy download function
+
+2. js/app-firebase.js
+   - Added saveExportMetadata() for metadata-only saves
+   - Converted saveExport() to legacy wrapper
+   - Removed size checking logic
+
+TESTING STEPS
+==============
+
+To verify the implementation works:
+
+1. Open the app in Chrome
+2. Create or load a design
+3. Click Export button
+4. Verify:
+   ✓ ZIP file downloads to your Downloads folder
+   ✓ Success modal shows correct contents
+   ✓ Console shows: "Export: triggering download: [filename].zip"
+   ✓ Console shows: "✅ Export metadata saved to Firestore"
+
+5. Check Firestore exports collection:
+   ✓ New document with ID: export-meta-[timestamp]
+   ✓ Contains: designId, designName, templateKey, sizeBytes, fileName, createdAt
+   ✓ Document is small (~0.5KB)
+
+WHAT'S NEXT
+===========
+
+Ready for deployment to S3 after testing confirms:
+- Export downloads work correctly
+- Metadata saves to Firestore
+- No console errors
+- Legacy exports still work
+
+Future enhancements (Phase 4+):
+- Update export card UI for new behavior
+- Add "Re-export" button
+- Navigate to source design from export metadata
+
+DOCUMENTATION
+=============
+
+Full details in:
+- ~/Desktop/email-app-shared-memory/inbox/claude/logs/phase-3-export-refactor-2025-11-23.txt
+- ~/Desktop/email-app-shared-memory/inbox/claude/diffs/phase-3-export-refactor.diff

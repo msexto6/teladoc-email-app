@@ -1,0 +1,125 @@
+--- a/js/app-save-load.js
++++ b/js/app-save-load.js
+@@ -end of SAVE MODAL FUNCTIONS section
++// ============================================
++// SPRINT 3: DUPLICATE DESIGN FUNCTIONALITY
++// ============================================
++
++/**
++ * Compute a unique duplicate name to avoid collisions.
++ * Given a base name like "My Design", returns "My Design_1", "My Design_2", etc.
++ * depending on which names already exist in the database.
++ * 
++ * @param {string} baseName - The original project name to duplicate
++ * @returns {Promise<string>} - A unique name with _1, _2, etc. suffix
++ */
++async function computeDuplicateName(baseName) {
++    console.log('=== computeDuplicateName called ===');
++    console.log('baseName:', baseName);
++    
++    // Get all existing designs to check for name collisions
++    const allDesigns = await EmailBriefingDB.getAllDesigns();
++    const safeDesigns = Array.isArray(allDesigns) ? allDesigns : [];
++    
++    // Build a set of existing project names
++    const existingNames = new Set();
++    safeDesigns.forEach(design => {
++        // Handle both nested (Firestore) and flat data structures
++        const data = design.data || design;
++        const projectName = design.projectName || data.projectName || '';
++        if (projectName) {
++            existingNames.add(projectName.trim());
++        }
++    });
++    
++    console.log('Existing names count:', existingNames.size);
++    
++    // Find an available name with _1, _2, _3, etc. suffix
++    let counter = 1;
++    let candidate;
++    do {
++        candidate = `${baseName}_${counter}`;
++        counter++;
++        // Safety limit to prevent infinite loop
++        if (counter > 1000) {
++            console.warn('Hit counter limit in computeDuplicateName');
++            break;
++        }
++    } while (existingNames.has(candidate));
++    
++    console.log('Computed duplicate name:', candidate);
++    console.log('=== computeDuplicateName completed ===');
++    
++    return candidate;
++}
++
++/**
++ * Duplicate a design from a card in My Designs.
++ * Creates a new design with:
++ * - A new unique ID (email-project-<timestamp>)
++ * - A unique name (OriginalName_1, _2, etc.)
++ * - All content copied from the original (formData + images)
++ * - Placed in the same folder as the original
++ * 
++ * @param {string} storageKey - The ID of the design to duplicate
++ * @param {string} folderId - The folder ID where the duplicate should be placed (empty string for root)
++ */
++async function duplicateDesignFromCard(storageKey, folderId) {
++    console.log('=== duplicateDesignFromCard called ===');
++    console.log('storageKey:', storageKey);
++    console.log('folderId:', folderId);
++    
++    try {
++        // Step 1: Load existing design
++        const dataStr = await dbGet(storageKey);
++        if (!dataStr) {
++            console.error('Source project not found:', storageKey);
++            alert('Source project not found');
++            return;
++        }
++        
++        // Step 2: Parse and extract the actual design data
++        const rawData = JSON.parse(dataStr);
++        // Handle nested structure from Firestore: { id, data: {...}, timestamp, ... }
++        const sourceData = rawData.data || rawData;
++        
++        // Step 3: Deep-copy the design data to avoid reference issues
++        const newData = JSON.parse(JSON.stringify(sourceData));
++        
++        // Step 4: Compute new project name to avoid collisions
++        const originalName = sourceData.projectName || 'Untitled';
++        const newProjectName = await computeDuplicateName(originalName);
++        
++        // Step 5: Generate a new unique design ID
++        const newId = 'email-project-' + Date.now();
++        
++        // Step 6: Update fields on the new data
++        newData.projectName = newProjectName;
++        newData.savedDate = new Date().toISOString();
++        
++        // Step 7: Save the new design via dbSave
++        await dbSave(newId, JSON.stringify(newData));
++        
++        // Step 8: Add to folder (if folderId provided and not empty string)
++        if (folderId && folderId !== '' && folderId !== 'null' && typeof addItemToFolder === 'function') {
++            await addItemToFolder(folderId, newId);
++        }
++        
++        // Step 9: Refresh the current folder view
++        if (typeof loadSavedDesigns === 'function') {
++            await loadSavedDesigns();
++        }
++        
++    } catch (err) {
++        console.error('❌ Error duplicating design:', err);
++        alert('Error duplicating design: ' + err.message);
++    }
++}
++
+ // ============================================
+ // FUNCTION ASSIGNMENTS
+ // ============================================
+@@ FUNCTION ASSIGNMENTS section - added:
++// SPRINT 3: Expose duplicate functions globally for context menu
++window.duplicateDesignFromCard = duplicateDesignFromCard;
++window.computeDuplicateName = computeDuplicateName;

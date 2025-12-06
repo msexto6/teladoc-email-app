@@ -1,0 +1,466 @@
+/**
+ * Navigation Controller
+ * Manages screen transitions and search functionality
+ * 
+ * ✅ UPDATED: Now delegates to folder-aware and IndexedDB-aware functions
+ */
+
+// Navigate with unsaved changes check
+function navigateToScreen(screenName) {
+    // Check if leaving builder with unsaved changes
+    const builderScreen = document.getElementById('builder-screen');
+    if (builderScreen && builderScreen.classList.contains('active')) {
+        // Currently on builder screen, check for unsaved changes
+        if (typeof checkUnsavedChangesBeforeNav === 'function') {
+            const canNavigate = checkUnsavedChangesBeforeNav(screenName);
+            if (canNavigate) {
+                showScreen(screenName);
+            }
+            // If canNavigate is false, the modal will handle navigation
+        } else {
+            // Fallback if change tracking not loaded
+            showScreen(screenName);
+        }
+    } else {
+        // Not on builder, navigate normally
+        showScreen(screenName);
+    }
+}
+
+// Show/hide screens
+function showScreen(screenName) {
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    
+    // Show requested screen
+    const targetScreen = document.getElementById(`${screenName}-screen`);
+    if (targetScreen) {
+        targetScreen.classList.add('active');
+    }
+    
+    // Update navigation menu active state
+    updateNavActiveState(screenName);
+    
+    // Show/hide appropriate masthead sub-navigation
+    const templatesSubnav = document.getElementById('masthead-subnav-templates');
+    const myDesignsSubnav = document.getElementById('masthead-subnav-mydesigns');
+    
+    if (templatesSubnav && myDesignsSubnav) {
+        if (screenName === 'template-selection') {
+            templatesSubnav.style.display = 'block';
+            myDesignsSubnav.style.display = 'none';
+            // Update breadcrumb when switching to templates
+            if (typeof updateBreadcrumb === 'function') {
+                updateBreadcrumb();
+            }
+        } else if (screenName === 'my-designs') {
+            templatesSubnav.style.display = 'none';
+            myDesignsSubnav.style.display = 'block';
+            // Update breadcrumb when switching to my designs
+            if (typeof updateBreadcrumb === 'function') {
+                updateBreadcrumb();
+            }
+        } else {
+            templatesSubnav.style.display = 'none';
+            myDesignsSubnav.style.display = 'none';
+        }
+    }
+    
+    // Reset folder path when leaving templates/my-designs
+    if (screenName === 'landing' && typeof currentFolderPath !== 'undefined') {
+        currentFolderPath = [];
+    }
+    
+    // Close mobile menu if open
+    closeMobileMenu();
+}
+
+// Update navigation menu active state
+function updateNavActiveState(screenName) {
+    // Remove active class from all nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Add active class to current screen's nav item
+    const activeNavItem = document.querySelector(`.nav-item[data-screen="${screenName}"]`);
+    if (activeNavItem) {
+        activeNavItem.classList.add('active');
+    }
+}
+
+// Close mobile menu
+function closeMobileMenu() {
+    const navMenu = document.getElementById('nav-menu');
+    const hamburger = document.getElementById('hamburger');
+    if (navMenu && hamburger) {
+        navMenu.classList.remove('mobile-active');
+        hamburger.classList.remove('active');
+    }
+}
+
+// Navigate back from builder - goes to parent folder or page
+function goBackFromBuilder() {
+    // Check for unsaved changes before leaving
+    const builderScreen = document.getElementById('builder-screen');
+    if (builderScreen && builderScreen.classList.contains('active')) {
+        if (typeof checkUnsavedChangesBeforeNav === 'function' && typeof hasUnsavedChanges === 'function' && hasUnsavedChanges()) {
+            // Show unsaved changes dialog
+            const targetPage = (typeof navigationHistory !== 'undefined' && navigationHistory.page) ? navigationHistory.page : 'template-selection';
+            checkUnsavedChangesBeforeNav(targetPage);
+            return; // Dialog will handle the actual navigation
+        }
+    }
+    
+    // No unsaved changes, proceed with navigation
+    // Use the navigationHistory stored when opening the design/template
+    if (typeof navigationHistory !== 'undefined' && navigationHistory.page) {
+        // Restore the folder path
+        if (typeof currentFolderPath !== 'undefined') {
+            currentFolderPath = [...navigationHistory.folderPath];
+        }
+        
+        // Navigate to the stored page
+        if (navigationHistory.page === 'template-selection') {
+            if (typeof loadTemplateCards === 'function') {
+                loadTemplateCards();
+            }
+            showScreen('template-selection');
+        } else if (navigationHistory.page === 'my-designs') {
+            if (typeof loadSavedDesigns === 'function') {
+                loadSavedDesigns();
+            }
+            showScreen('my-designs');
+        } else {
+            // Default to template selection if no valid history
+            showScreen('template-selection');
+        }
+    } else {
+        // Fallback: go to template selection
+        showScreen('template-selection');
+    }
+}
+
+// Initialize navigation when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // FIX #3: Hamburger menu toggle
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('mobile-active');
+        });
+    }
+    
+    // Navigation menu click handlers
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            const targetScreen = this.getAttribute('data-screen');
+            
+            // FIX #4: Make "Templates" word clickable to navigate to template selection
+            if (this.classList.contains('nav-item-with-dropdown')) {
+                // Reset folder path when navigating to Templates via main nav
+                if (typeof currentFolderPath !== 'undefined') {
+                    currentFolderPath = [];
+                }
+                
+                // On desktop (>1000px), only navigate if clicking directly on text, not hovering dropdown
+                if (window.innerWidth > 1000) {
+                    // Navigate to template selection page with unsaved changes check
+                    populateTemplateCards();
+                    navigateToScreen('template-selection');
+                } else {
+                    // On mobile (<=1000px), show template selection
+                    populateTemplateCards();
+                    navigateToScreen('template-selection');
+                }
+                return;
+            }
+            
+            // Handle other navigation items with unsaved changes check
+            if (targetScreen === 'my-designs') {
+                // Reset folder path when navigating via main nav
+                if (typeof currentFolderPath !== 'undefined') {
+                    currentFolderPath = [];
+                }
+                // ✅ FIXED: Call folder-aware version from folders-trash.js
+                if (typeof loadSavedDesigns === 'function') {
+                    loadSavedDesigns();
+                }
+            } else if (targetScreen === 'template-selection') {
+                // Reset folder path when navigating via main nav
+                if (typeof currentFolderPath !== 'undefined') {
+                    currentFolderPath = [];
+                }
+                populateTemplateCards();
+            }
+            
+            navigateToScreen(targetScreen);
+        });
+    });
+    
+    // Template dropdown click handlers
+    document.querySelectorAll('.templates-dropdown-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent nav-item click
+            const templateId = this.getAttribute('data-template');
+            
+            // Save navigation state - dropdown opens from landing page
+            if (typeof navigationHistory !== 'undefined') {
+                navigationHistory = {
+                    page: 'template-selection',
+                    folderPath: []
+                };
+            }
+            
+            selectTemplate(templateId);
+        });
+    });
+    
+    // Landing screen buttons
+    document.getElementById('my-designs-btn').addEventListener('click', function() {
+        // Reset folder path
+        if (typeof currentFolderPath !== 'undefined') {
+            currentFolderPath = [];
+        }
+        // ✅ FIXED: Call folder-aware version from folders-trash.js
+        if (typeof loadSavedDesigns === 'function') {
+            loadSavedDesigns();
+        }
+        navigateToScreen('my-designs');
+    });
+    
+    document.getElementById('templates-btn').addEventListener('click', function() {
+        // Reset folder path
+        if (typeof currentFolderPath !== 'undefined') {
+            currentFolderPath = [];
+        }
+        populateTemplateCards();
+        navigateToScreen('template-selection');
+    });
+    
+    // Global search functionality (optional - only if element exists)
+    const globalSearch = document.getElementById('global-search');
+    if (globalSearch) {
+        globalSearch.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            performGlobalSearch(searchTerm);
+        });
+    }
+    
+    // Populate template cards when page loads
+    populateTemplateDropdown();
+    populateTemplateCards();
+    
+    // FIX #6: Auto-toggle mobile view at 1200px
+    function checkViewportAndToggleMobileView() {
+        const previewEmail = document.querySelector('.preview-email');
+        const desktopBtn = document.getElementById('desktop-view');
+        const mobileBtn = document.getElementById('mobile-view');
+        
+        if (window.innerWidth <= 1200) {
+            // Force mobile view
+            if (previewEmail) {
+                previewEmail.classList.add('mobile-view');
+            }
+            if (desktopBtn && mobileBtn) {
+                desktopBtn.classList.remove('active');
+                mobileBtn.classList.add('active');
+                // Disable desktop button at this viewport
+                desktopBtn.style.opacity = '0.5';
+                desktopBtn.style.cursor = 'not-allowed';
+                desktopBtn.style.pointerEvents = 'none';
+            }
+        } else {
+            // Re-enable desktop button above 1200px
+            if (desktopBtn) {
+                desktopBtn.style.opacity = '1';
+                desktopBtn.style.cursor = 'pointer';
+                desktopBtn.style.pointerEvents = 'auto';
+            }
+        }
+    }
+    
+    // Check on load and resize
+    checkViewportAndToggleMobileView();
+    window.addEventListener('resize', checkViewportAndToggleMobileView);
+});
+
+// Populate template selection screen with cards (now uses folder-aware function)
+function populateTemplateCards() {
+    // Call the folder-aware version from folders-trash.js
+    if (typeof loadTemplateCards === 'function') {
+        loadTemplateCards();
+    } else {
+        // Fallback to basic template loading
+        const grid = document.getElementById('template-cards-grid');
+        grid.innerHTML = '';
+        
+        Object.keys(templates).forEach(templateId => {
+            const template = templates[templateId];
+            
+            const card = document.createElement('div');
+            card.className = 'template-card';
+            card.innerHTML = `
+                <div class="template-card-content">
+                    <img src="assets/images/template-icon.png" alt="${template.name}" class="document-icon">
+                    <h3 class="template-card-title">${template.name}</h3>
+                </div>
+            `;
+            
+            card.addEventListener('click', function() {
+                selectTemplate(templateId);
+            });
+            
+            grid.appendChild(card);
+        });
+    }
+}
+
+// Select a template and go to builder
+function selectTemplate(templateId) {
+    // PHASE 2 TASK 2: Set template in window and sessionStorage
+    window.currentTemplateKey = templateId;
+    window.currentTemplate = window.templates?.[templateId];
+    sessionStorage.setItem("selectedTemplateKey", templateId);
+    
+    // Save navigation state before entering builder
+    if (typeof navigationHistory !== 'undefined') {
+        const templatesScreen = document.getElementById('template-selection-screen');
+        if (templatesScreen && templatesScreen.classList.contains('active')) {
+            navigationHistory = {
+                page: 'template-selection',
+                folderPath: typeof currentFolderPath !== 'undefined' ? [...currentFolderPath] : []
+            };
+        } else {
+            // Coming from dropdown or other source - go to templates root
+            navigationHistory = {
+                page: 'template-selection',
+                folderPath: []
+            };
+        }
+    }
+    
+    // FRESH TEMPLATE PATH: Set flag to FALSE and clear tracking variables
+    isLoadingSavedDesign = false;
+    savedDesignName = null;
+    savedDesignTemplateName = null;
+    window.currentFileHandle = null;
+    window.currentLocalStorageKey = null;
+    window.currentProjectName = null;
+    
+    // Set the template in the dropdown (if it still exists for backward compatibility)
+    const templateSelector = document.getElementById('template-selector');
+    if (templateSelector) {
+        templateSelector.value = templateId;
+        // Trigger the change event to load the template
+        const event = new Event('change');
+        templateSelector.dispatchEvent(event);
+    }
+    
+    // Trigger template selected event for change tracking
+    window.dispatchEvent(new Event('template-selected'));
+    
+    // Show builder screen with template parameter
+    // window.location.href = `index.html?template=${templateId}#builder`;
+    // Since we're in a single-page app, just show the builder screen
+    showScreen('builder');
+    
+    // Load the template if loadTemplateByKey exists
+    if (typeof window.loadTemplateByKey === 'function') {
+        window.loadTemplateByKey(templateId);
+    }
+}
+
+// Alternative navigation function for template pages (if needed)
+function navigateToTemplatePage(templateKey) {
+    // PHASE 2 TASK 2: Set template in window and sessionStorage
+    window.currentTemplateKey = templateKey;
+    window.currentTemplate = window.templates?.[templateKey];
+    sessionStorage.setItem("selectedTemplateKey", templateKey);
+    
+    // Navigate to builder with template parameter
+    // Since this is a single-page app, we'll handle it within the same page
+    showScreen('builder');
+    
+    // Load the template if loadTemplateByKey exists
+    if (typeof window.loadTemplateByKey === 'function') {
+        window.loadTemplateByKey(templateKey);
+    }
+}
+
+// ✅ REMOVED: Old loadSavedDesigns() and loadDesign() functions
+// These are now handled by the folder-aware loadSavedDesigns() in folders-trash.js
+// and IndexedDB-aware loadDesignFromCard() in app-save-load.js
+
+// Global search functionality
+function performGlobalSearch(searchTerm) {
+    if (!searchTerm) {
+        // If empty, just show landing screen
+        return;
+    }
+    
+    // Search templates
+    const matchingTemplates = Object.keys(templates).filter(templateId => {
+        const template = templates[templateId];
+        return template.name.toLowerCase().includes(searchTerm);
+    });
+    
+    // Search saved designs
+    const matchingDesigns = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('email-project-')) {
+            try {
+                const project = JSON.parse(localStorage.getItem(key));
+                if ((project.projectName || '').toLowerCase().includes(searchTerm)) {
+                    matchingDesigns.push(key);
+                }
+            } catch (e) {
+                console.error('Error searching project:', e);
+            }
+        }
+    }
+    
+    // Show results (you can customize this UI)
+    console.log('Matching templates:', matchingTemplates);
+    console.log('Matching designs:', matchingDesigns);
+}
+
+// Populate the hidden template dropdown with options
+function populateTemplateDropdown() {
+    const templateSelector = document.getElementById('template-selector');
+    if (!templateSelector) return;
+    
+    // Clear existing options
+    templateSelector.innerHTML = '<option value="">Select a template...</option>';
+    
+    // Add all templates
+    Object.keys(templates).forEach(templateId => {
+        const template = templates[templateId];
+        const option = document.createElement('option');
+        option.value = templateId;
+        option.textContent = template.name;
+        templateSelector.appendChild(option);
+    });
+}
+
+// Masthead home link click handler
+document.addEventListener('DOMContentLoaded', function() {
+    const mastheadHomeLink = document.getElementById('masthead-home-link');
+    if (mastheadHomeLink) {
+        mastheadHomeLink.addEventListener('click', function() {
+            // Reset folder path when going home
+            if (typeof currentFolderPath !== 'undefined') {
+                currentFolderPath = [];
+            }
+            navigateToScreen('landing');
+        });
+    }
+});
