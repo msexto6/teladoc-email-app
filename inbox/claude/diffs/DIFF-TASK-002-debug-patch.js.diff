@@ -1,0 +1,7 @@
+--- /app/current-version/js/debug-patch.js	(original)
++++ /app/current-version/js/debug-patch.js	(modified)
+@@ -1,3 +1,4 @@
++// TASK-002 TEST COMMENT: This is a safe simulated change and should not remain in production.
+ // Debug Patch for FormData Issue
+ // This code will help us track exactly what's happening with formData
+ 
