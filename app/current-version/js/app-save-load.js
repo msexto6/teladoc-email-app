@@ -131,6 +131,19 @@ async function loadDesignById(designId, options = {}) {
             window.applyExampleDefaults(formData, templateDefinition.fields);
         }
 
+        // TASK-003: Use AppState for centralized state reset before loading
+        if (typeof window.AppState !== 'undefined' && typeof window.AppState.resetBeforeLoad === 'function') {
+            window.AppState.resetBeforeLoad(designId);
+        } else {
+            // Fallback: Manual state clearing if AppState not available
+            console.log("⚠️ AppState not available, using manual state reset fallback");
+        }
+
+        // CRITICAL: Save navigation state BEFORE loading (for My Designs back button)
+        if (typeof window.applyExampleDefaults === "function") {
+            window.applyExampleDefaults(formData, templateDefinition.fields);
+        }
+
         // CRITICAL: Save navigation state BEFORE loading (for My Designs back button)
         if (typeof navigationHistory !== 'undefined' && typeof currentFolderPath !== 'undefined') {
             const myDesignsScreen = document.getElementById('my-designs-screen');

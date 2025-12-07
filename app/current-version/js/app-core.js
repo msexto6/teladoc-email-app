@@ -4,6 +4,7 @@
  * Last Updated: November 2025
  * 
  * LOAD PIPELINE V2: Unified loading system for all design sources
+ * TASK-003: Integrated centralized AppState management
  */
 
 // ============================================
@@ -93,6 +94,24 @@ window.convertPlainTextToHtmlParagraphs = function(text) {
 async function init() {
     // Firebase auto-connects, no initialization needed
     console.log('✓ Database initialized successfully');
+    
+    // TASK-003: Register global state references with AppState
+    if (typeof window.AppState !== 'undefined' && typeof window.AppState.registerGlobals === 'function') {
+        window.AppState.registerGlobals({
+            formData: window.formData,
+            uploadedImages: window.uploadedImages,
+            currentTemplate: { value: currentTemplate },
+            currentTemplateKey: { value: currentTemplateKey },
+            currentDesignId: window,
+            currentFileHandle: window,
+            currentProjectName: window,
+            currentLocalStorageKey: window,
+            builderMode: window
+        });
+        console.log('✓ AppState registered successfully');
+    } else {
+        console.warn('⚠️ AppState not available - state management will be manual');
+    }
     
     setupEventListeners();
     
@@ -190,10 +209,15 @@ window.loadTemplateByKey = function(templateKey) {
     window.currentTemplateKey = currentTemplateKey;
     window.currentTemplate = currentTemplate;
     
-    // CRITICAL FIX: Clear global state objects without reassigning references
-    Object.keys(window.formData).forEach(key => delete window.formData[key]);
-    Object.keys(window.uploadedImages).forEach(key => delete window.uploadedImages[key]);
-    console.log("🔄 State reset: formData and uploadedImages cleared");
+    // TASK-003: Use AppState for centralized state reset
+    if (typeof window.AppState !== 'undefined' && typeof window.AppState.resetForTemplateChange === 'function') {
+        window.AppState.resetForTemplateChange(key, templateDefinition);
+    } else {
+        // Fallback: Manual state clearing if AppState not available
+        Object.keys(window.formData).forEach(key => delete window.formData[key]);
+        Object.keys(window.uploadedImages).forEach(key => delete window.uploadedImages[key]);
+        console.log("🔄 State reset: formData and uploadedImages cleared (manual fallback)");
+    }
     
     // SPRINT N3: Clear currentDesignId for fresh template (new design)
     if (typeof window.currentDesignId !== 'undefined') {
