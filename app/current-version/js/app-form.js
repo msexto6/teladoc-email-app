@@ -1,6 +1,7 @@
 // LOAD PIPELINE V2: Guard form handlers during project loads
 // SPRINT F: Added isDesignLoading guards to prevent race conditions
 // DEC 2025: Added toggle field type support for hero banner control
+// TASK-004: Made generateForm async with DOM ready detection
 
 /**
  * SPRINT: DEFAULT VALUES
@@ -202,7 +203,17 @@ function handleTemplateChange(e) {
 // PHASE 2 TASK B2: Robust generateForm with comprehensive error handling
 // PHASE 3 TASK D: Now initializes form fields with default values from template definitions
 // ACCORDION SPRINT: Added accordion group support for Standard template
-function generateForm(templateKey, templateDefinition) {
+// TASK-004: Made async with Promise-based DOM ready detection
+/**
+ * Generate the form for a template with async DOM ready detection.
+ * Returns a Promise that resolves when the form is fully rendered and DOM is ready.
+ * 
+ * @param {string} templateKey - The template key to generate form for
+ * @param {Object} templateDefinition - The template definition object
+ * @returns {Promise<void>} Resolves when form DOM is ready
+ */
+async function generateForm(templateKey, templateDefinition) {
+    console.log("🏁 TASK-004: Template load started");
     console.group("🧩 generateForm");
 
     // 1. Resolve the template key
@@ -295,7 +306,24 @@ function generateForm(templateKey, templateDefinition) {
     }
 
     console.groupEnd();
+    
+    // TASK-004: Wait for DOM to be fully ready before resolving
+    console.log("⏳ TASK-004: Waiting for DOM render completion...");
+    
+    return new Promise((resolve) => {
+        // Use requestAnimationFrame to ensure browser has painted
+        requestAnimationFrame(() => {
+            // Add small delay to ensure all elements are queryable
+            setTimeout(() => {
+                console.log("✅ TASK-004: Form render completed - DOM ready");
+                resolve();
+            }, 50);
+        });
+    });
 }
+
+// Expose globally for backward compatibility
+window.generateForm = generateForm;
 
 /**
  * ACCORDION SPRINT: Render core email fields (subject + preview) at the top
