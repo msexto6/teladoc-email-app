@@ -1,4 +1,5 @@
 // LOAD PIPELINE V2: Centralized loading system for all design sources
+// TASK-004: Updated loadDesignById to properly await async generateForm
 // Global variables to track current file handle (on window object for cross-file access)
 window.currentFileHandle = null;
 window.currentProjectName = null;
@@ -40,6 +41,7 @@ window.isNewDesign = isNewDesign;
 
 /**
  * SPRINT F: Atomic design loader
+ * TASK-004: Updated with proper async/await for form generation and logging
  * Single async function that handles all design loading paths
  * Prevents half-loaded forms and race conditions
  * 
@@ -62,6 +64,7 @@ async function loadDesignById(designId, options = {}) {
 
     isDesignLoading = true;
     console.log('🔒 loadDesignById started:', designId, options);
+    console.log('🏁 TASK-004: Template load started');
 
     try {
         // SPRINT N3: Mark as existing design BEFORE any form initialization
@@ -140,11 +143,6 @@ async function loadDesignById(designId, options = {}) {
         }
 
         // CRITICAL: Save navigation state BEFORE loading (for My Designs back button)
-        if (typeof window.applyExampleDefaults === "function") {
-            window.applyExampleDefaults(formData, templateDefinition.fields);
-        }
-
-        // CRITICAL: Save navigation state BEFORE loading (for My Designs back button)
         if (typeof navigationHistory !== 'undefined' && typeof currentFolderPath !== 'undefined') {
             const myDesignsScreen = document.getElementById('my-designs-screen');
             if (myDesignsScreen && myDesignsScreen.classList.contains('active')) {
@@ -177,18 +175,17 @@ async function loadDesignById(designId, options = {}) {
             }
         }
 
-        // 3) Generate form for the template (must be awaitable)
-        // Wrap in Promise if generateForm isn't already async
-        await new Promise((resolve) => {
-            if (typeof generateForm === 'function') {
-                generateForm(templateKey, templateDefinition);
-                // Give DOM a moment to render
-                setTimeout(resolve, 100);
-            } else {
-                console.error('generateForm function not found');
-                resolve();
-            }
-        });
+        // TASK-004: Properly await async generateForm
+        if (typeof generateForm === 'function') {
+            // generateForm now returns a Promise that resolves when DOM is ready
+            await generateForm(templateKey, templateDefinition);
+            console.log('✅ TASK-004: Form render completed');
+        } else {
+            console.error('generateForm function not found');
+        }
+        
+        // TASK-004: State hydration begins AFTER form is ready
+        console.log('⏳ TASK-004: State hydration started');
 
         // 4) Hydrate fields with formData
         if (typeof applySavedFormDataToDOM === 'function') {
@@ -199,6 +196,8 @@ async function loadDesignById(designId, options = {}) {
         if (typeof applySavedImagesToDOM === 'function') {
             await applySavedImagesToDOM(uploadedImages);
         }
+
+        console.log('✅ TASK-004: Done');
 
         // 6) Update global state
         window.currentTemplateKey = templateKey;
